@@ -7,17 +7,17 @@ def _test_partof(rec: dict, part_of: str) -> bool:
     return part_of in rec.get('part_of', {})
 
 
-@click.command(
-    help="""\
-Every option can be given multiple times. All values given
-for an individual check are considered to be valid alternatives
-(OR-test). Across different checks, all conditions must be met
-(AND-test).
-"""
-)
+@click.command()
 @click.option(
     '--part-of', help='Identifier of a parent project', multiple=True)
 def cli(part_of: str | None = None):
+    """Filter project records matching particular criteria.
+
+    Every option can be given multiple times. All values given
+    for an individual check are considered to be valid alternatives
+    (OR-test). Across different checks, all conditions must be met
+    (AND-test).
+    """
     for line in sys.stdin:
         rec = json.loads(line)
         report = True
