@@ -45,8 +45,12 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
+  "click",
   "dump-things-pyclient @ git+https://hub.psychoinformatics.de/datalink/dump-things-pyclient.git@master",
 ]
+
+[project.scripts]
+filter-rsegroup-projects = "query_rse_group.filter_projects:cli"
 
 [project.urls]
 Homepage = "https://hub.psychoinformatics.de/datalink/query-rse-group"
