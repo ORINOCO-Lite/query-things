@@ -61,6 +61,10 @@ def cli(
     template = jinja_env.get_template(template.name)
     for line in sys.stdin:
         rec = json.loads(line)
-        output_filepath = Path(output_filename_template.format(**rec))
+        props = {
+            '__pid_curie_reference': rec['pid'].split(':', maxsplit=1)[1],
+        }
+        props.update(rec)
+        output_filepath = Path(output_filename_template.format(**props))
         rendered_rec = template.render(**rec)
         output_filepath.write_text(rendered_rec)
