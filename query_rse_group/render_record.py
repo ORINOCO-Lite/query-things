@@ -66,5 +66,6 @@ def cli(
         }
         props.update(rec)
         output_filepath = Path(output_filename_template.format(**props))
+        output_filepath.parent.mkdir(exist_ok=True)
         rendered_rec = template.render(**rec)
         output_filepath.write_text(rendered_rec)
