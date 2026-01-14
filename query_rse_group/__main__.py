@@ -2,6 +2,7 @@ import click
 from query_rse_group import (
     filter_linked_pid,
     filter_projects,
+    inline_records,
     render_record,
     resolve_datasets,
 )
@@ -16,6 +17,7 @@ def main():
 for mod in (
     filter_linked_pid,
     filter_projects,
+    inline_records,
     render_record,
     resolve_datasets,
 ):
