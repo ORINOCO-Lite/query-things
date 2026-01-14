@@ -5,6 +5,8 @@ import sys
 
 from dump_things_pyclient.communicate import collection_read_record_with_pid
 
+from query_rse_group import stdargs
+
 
 def _resolve_record(
     rec: dict,
@@ -31,9 +33,9 @@ def _resolve_record(
 
 
 @click.command('resolve-datasets')
-@click.option('--api-url')
-@click.option('--token', envvar='DUMPTHINGS_TOKEN')
-@click.option('--collection', multiple=True)
+@click.option('--api-url', **stdargs['--api-url'])
+@click.option('--token', **stdargs['--token'])
+@click.option('--collection', multiple=True, **stdargs['collection'])
 def cli(api_url: str, token: str, collection=('public',)):
     """Resolve and inline metadata linked to dataset records.
     """
