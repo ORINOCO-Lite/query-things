@@ -7,7 +7,7 @@ def _test_partof(rec: dict, part_of: str) -> bool:
     return part_of in rec.get('part_of', {})
 
 
-@click.command()
+@click.command('filter-projects')
 @click.option(
     '--part-of', help='Identifier of a parent project', multiple=True)
 def cli(part_of: str | None = None):

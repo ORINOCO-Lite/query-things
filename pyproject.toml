@@ -51,9 +51,7 @@ dependencies = [
 ]
 
 [project.scripts]
-filter-rsegroup-projects = "query_rse_group.filter_projects:cli"
-render-record = "query_rse_group.render_record:cli"
-resolve-datasets = "query_rse_group.resolve_datasets:cli"
+qrg = "query_rse_group.__main__:main"
 
 [project.urls]
 Homepage = "https://hub.psychoinformatics.de/datalink/query-rse-group"

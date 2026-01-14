@@ -12,7 +12,7 @@ default_statement_marker = '%'
 default_comment_marker = '#'
 
 
-@click.command()
+@click.command('render-record')
 @click.argument(
     'template',
     type=click.Path(

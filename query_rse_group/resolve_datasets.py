@@ -30,7 +30,7 @@ def _resolve_record(
     return out
 
 
-@click.command()
+@click.command('resolve-datasets')
 @click.option('--api-url')
 @click.option('--token', envvar='DUMPTHINGS_TOKEN')
 @click.option('--collection', multiple=True)
