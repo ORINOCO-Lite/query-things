@@ -37,6 +37,7 @@ def _resolve_records(
     token: str,
     collections: tuple[str],
     cache: dict,
+    pid_prop: str = 'object',
 ) -> None:
     prop_in = rec.get(property)
     if prop_in is None:
@@ -45,22 +46,28 @@ def _resolve_records(
 
     scalar = not isinstance(prop_in, (list, tuple))
     prop_out = []
-    for p in ([prop_in] if scalar else prop_in):
-        pid = p['object'] if isinstance(p, dict) else p
-        resolved = _get_rec_from_any_collection(
-            api_url,
-            collections,
-            pid,
-            cache,
-            token=token,
-        )
-        if resolved is None:
-            po = p
-        elif isinstance(p, dict):
-            po = p.copy()
-            po['object'] = resolved
+    for prop in ([prop_in] if scalar else prop_in):
+        pid = prop[pid_prop] if isinstance(prop, dict) else prop
+
+        def _proc_pid(pid):
+            resolved = _get_rec_from_any_collection(
+                api_url,
+                collections,
+                pid,
+                cache,
+                token=token,
+            )
+            return resolved if resolved is not None else pid
+
+        inlined = [_proc_pid(pi) for pi in pid] \
+            if isinstance(pid, list) \
+            else _proc_pid(pid)
+
+        if isinstance(prop, dict):
+            po = prop.copy()
+            po[pid_prop] = inlined
         else:
-            po = resolved
+            po = inlined
         prop_out.append(po)
     rec[property] = prop_out[0] if scalar else prop_out
 
@@ -69,7 +76,14 @@ def _resolve_records(
 @click.option(
     '-p', '--property',
     multiple=True,
-    help='Property to inline records for. Can be given multiple times.',
+    help="""\
+Property to inline records for. Can be given multiple times.
+When the property value is an object, the PID is assumed to be
+available under an "object" key. If another field should be
+used, it can be given with a `::<key>` suffix (e.g.,
+`--property delegated_by::roles`). The PID field can be
+multivalued.
+"""
 )
 @click.option('--api-url', **stdargs['--api-url'])
 @click.option('--token', **stdargs['--token'])
@@ -92,10 +106,12 @@ def cli(
     for line in sys.stdin:
         rec = json.loads(line)
         for prop in property:
+            parent_prop = prop.split('::', maxsplit=1)
             _resolve_records(
-                prop,
+                parent_prop[0],
                 rec,
                 api_url, token, collection,
                 rec_cache,
+                pid_prop=parent_prop[1] if len(parent_prop) > 1 else 'object',
             )
         click.echo(json.dumps(rec), nl=True)
