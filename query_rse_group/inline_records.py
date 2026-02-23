@@ -25,7 +25,9 @@ def _resolve_records(
     scalar = not isinstance(prop_in, (list, tuple))
     prop_out = []
     for prop in ([prop_in] if scalar else prop_in):
-        pid = prop[pid_prop] if isinstance(prop, dict) else prop
+        pid = prop.get(pid_prop) if isinstance(prop, dict) else prop
+        if pid is None:
+            continue
 
         def _proc_pid(pid):
             resolved = _get_rec_from_any_collection(
