@@ -1,4 +1,5 @@
 import click
+from datetime import datetime
 from jinja2 import (
     Environment,
     FileSystemLoader,
@@ -61,6 +62,10 @@ def cli(
     template = jinja_env.get_template(template.name)
     for line in sys.stdin:
         rec = json.loads(line)
+        rec.update(
+            __datetime=datetime,
+            __datetime_now=datetime.now(),
+        )
         props = {
             '__pid_curie_reference': rec['pid'].split(':', maxsplit=1)[1],
         }
