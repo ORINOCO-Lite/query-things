@@ -67,6 +67,7 @@ multivalued.
 )
 @click.option('--api-url', **stdargs['--api-url'])
 @click.option('--token', **stdargs['--token'])
+@click.option('--record-cache', **stdargs['--record-cache'])
 @click.option(
     '-c', '--collection',
     multiple=True,
@@ -78,11 +79,11 @@ def cli(
     property: tuple[str],
     api_url: str,
     token: str,
+    record_cache: dict,
     collection=('public',),
 ):
     """Resolve and inline metadata linked to dataset records.
     """
-    rec_cache = {}
     for line in sys.stdin:
         rec = json.loads(line)
         for prop in property:
@@ -91,7 +92,7 @@ def cli(
                 parent_prop[0],
                 rec,
                 api_url, token, collection,
-                rec_cache,
+                record_cache,
                 pid_prop=parent_prop[1] if len(parent_prop) > 1 else 'object',
             )
         click.echo(json.dumps(rec), nl=True)

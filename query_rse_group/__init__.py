@@ -2,7 +2,9 @@ import click
 import json
 from pathlib import Path
 
-from dump_things_pyclient.communicate import collection_read_record_with_pid
+from dump_things_pyclient.communicate import (
+    collection_read_record_with_pid,
+)
 
 
 def _handle_record_cache(ctx, param, value) -> {}:
