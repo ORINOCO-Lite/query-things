@@ -1,4 +1,29 @@
+import click
+import json
+from pathlib import Path
+
 from dump_things_pyclient.communicate import collection_read_record_with_pid
+
+
+def _handle_record_cache(ctx, param, value) -> {}:
+    if value is None:
+        # we return a cache, but it will be in-memory only
+        return {}
+
+    try:
+        with value.open('r') as fp:
+            cache = json.load(fp)
+    except (FileNotFoundError, json.decoder.JSONDecodeError):
+        # ok if it doesn't exist yet. If it doesn't load, we ignore it
+        cache = {}
+
+    @ctx.call_on_close
+    def dump_cache():
+        with value.open('w') as fp:
+            json.dump(cache, fp)
+
+    return cache
+
 
 # this collection cannot contain the help strings.
 # they are hard to write generic and still be fitting.
@@ -10,6 +35,13 @@ stdargs = {
     'collection': {},
     '--token': {
         'envvar': 'DUMPTHINGS_TOKEN',
+    },
+    '--record-cache': {
+        'envvar': 'QRI_RECORD_CACHE',
+        'callback': _handle_record_cache,
+        'type': click.Path(
+            file_okay=True, dir_okay=False, writable=True, readable=True,
+            path_type=Path),
     },
 }
 

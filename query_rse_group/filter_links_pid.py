@@ -24,6 +24,7 @@ from query_rse_group import (
 )
 @click.option('--api-url', **stdargs['--api-url'])
 @click.option('--token', **stdargs['--token'])
+@click.option('--record-cache', **stdargs['--record-cache'])
 @click.option(
     '-c', '--collection',
     multiple=True,
@@ -36,12 +37,11 @@ def cli(
     recursive: bool,
     api_url: str,
     token: str,
+    record_cache: dict,
     collection=('public',),
 ):
     """Filter records that link a specific object via a given property
     """
-    rec_cache = {}
-
     def _pid_match(val: str | dict, pid: str, recursive: bool, via: str):
         if isinstance(val, dict):
             val = val['object']
@@ -54,7 +54,7 @@ def cli(
                 api_url,
                 collection,
                 val,
-                rec_cache,
+                record_cache,
                 token=token,
             )
             return _does_link(
