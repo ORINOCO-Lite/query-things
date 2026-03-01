@@ -52,6 +52,7 @@ dependencies = [
 
 [project.scripts]
 qrg = "query_rse_group.__main__:main"
+qri = "query_rse_group.__main__:main"
 
 [project.urls]
 Homepage = "https://hub.psychoinformatics.de/datalink/query-rse-group"
