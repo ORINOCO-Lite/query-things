@@ -21,6 +21,10 @@ from query_rse_group import (
     metavar='<PROPERTY>',
     multiple=True,
 )
+@click.option(
+    '--class', '-C', 'class_name',
+    help='Constrain injected objects to this class',
+)
 @click.option('--api-url', **stdargs['--api-url'])
 @click.option('--token', **stdargs['--token'])
 @click.option('--record-cache', **stdargs['--record-cache'])
@@ -34,6 +38,7 @@ from query_rse_group import (
 def cli(
     inject: str,
     link: tuple[str],
+    class_name: str,
     api_url: str,
     token: str,
     record_cache: dict,
@@ -47,6 +52,7 @@ def cli(
         for col in collection:
             linkers.extend(get_any_thing_that_links_pid_via_x(
                 link,
+                class_name,
                 api_url,
                 col,
                 rec['pid'],
@@ -68,6 +74,7 @@ def cli(
 
 def get_any_thing_that_links_pid_via_x(
     link: tuple[tuple[str, str]],
+    class_name: str,
     api_url: str,
     collection: str,
     pid: str,
@@ -101,7 +108,7 @@ def get_any_thing_that_links_pid_via_x(
         for res in collection_read_records_of_class(
             api_url,
             collection,
-            'Thing',
+            class_name if class_name else 'Thing',
             matching=pid,
             token=token,
         )
