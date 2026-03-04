@@ -7,11 +7,11 @@ from jinja2 import (
 import json
 from pathlib import Path
 import sys
+import yaml
 
 default_inlineblock_delims = default=('{', '}')
 default_statement_marker = '%'
 default_comment_marker = '#'
-
 
 @click.command('render-record')
 @click.argument(
@@ -34,12 +34,14 @@ default_comment_marker = '#'
 )
 @click.option('--jinja-statement-marker', default=default_statement_marker)
 @click.option('--jinja-comment-marker', default=default_comment_marker)
+@click.option('--include-data-at-key', default=None)
 def cli(
     template: Path,
     output_filename_template: str,
     jinja_block_delims: tuple[str, str] = default_inlineblock_delims,
     jinja_statement_marker: str = default_statement_marker,
     jinja_comment_marker: str = default_comment_marker,
+    include_data_at_key: str = None,
 ):
     """Render a template with a metadata record as input
 
@@ -62,6 +64,13 @@ def cli(
     template = jinja_env.get_template(template.name)
     for line in sys.stdin:
         rec = json.loads(line)
+        __data = dict(**rec)
+        if include_data_at_key:
+            rec[include_data_at_key] = yaml.safe_dump(
+                __data,
+                sort_keys=False,
+                default_flow_style=False,
+            )
         rec.update(
             __datetime=datetime,
             __datetime_now=datetime.now(),
