@@ -10,7 +10,7 @@ from query_rse_group import (
 
 @click.group()
 def main():
-    """Tools to query, filter, and process RSE group schema metadata
+    """Tools to query, filter, and process research information schema metadata
     """
 
 
