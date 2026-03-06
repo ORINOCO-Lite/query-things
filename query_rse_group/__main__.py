@@ -5,6 +5,7 @@ from query_rse_group import (
     inject_links_pid,
     inline_records,
     render_record,
+    cache,
 )
 
 
@@ -20,6 +21,7 @@ for mod in (
     inject_links_pid,
     inline_records,
     render_record,
+    cache,
 ):
     main.add_command(getattr(mod, 'cli'))
 
