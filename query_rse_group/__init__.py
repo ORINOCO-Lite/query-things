@@ -36,10 +36,12 @@ def _handle_record_cache(ctx, param, value) -> {}:
 stdargs = {
     '--api-url': {
         'envvar': 'DUMPTHINGS_APIURL',
+        'show_envvar': True,
     },
     'collection': {},
     '--token': {
         'envvar': 'DUMPTHINGS_TOKEN',
+        'show_envvar': True,
     },
     '--record-cache': {
         'envvar': 'QRI_RECORD_CACHE',
@@ -47,6 +49,7 @@ stdargs = {
         'type': click.Path(
             file_okay=True, dir_okay=False, writable=True, readable=True,
             path_type=Path),
+        'show_envvar': True,
     },
 }
 
