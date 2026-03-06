@@ -21,6 +21,9 @@ def _handle_record_cache(ctx, param, value) -> {}:
 
     @ctx.call_on_close
     def dump_cache():
+        if not cache:
+            # do not write an empty cache
+            return
         with value.open('w') as fp:
             json.dump(cache, fp)
 
