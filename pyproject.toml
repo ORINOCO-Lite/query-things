@@ -10,7 +10,7 @@ name = "query-rse-group"
 dynamic = ["version"]
 description = '(Demo) query and exporter implementations for the RSE group data model'
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = "MIT"
 keywords = [
   "linkml",
