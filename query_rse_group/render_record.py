@@ -34,7 +34,14 @@ default_comment_marker = '#'
 )
 @click.option('--jinja-statement-marker', default=default_statement_marker)
 @click.option('--jinja-comment-marker', default=default_comment_marker)
-@click.option('--include-data-at-key', default=None)
+@click.option(
+    '--include-data-at-key',
+    default=None,
+    help="""\
+Make the record available to the jinja template 
+as a dictionary accessible at a specific key
+"""
+)
 def cli(
     template: Path,
     output_filename_template: str,
@@ -61,16 +68,21 @@ def cli(
         #line_statement_prefix = f'',
         #line_comment_prefix = f'',
     )
+    def toyaml(input):
+        """Custom filter to convert an object to a YAML string"""
+        return yaml.safe_dump(
+            input,
+            sort_keys=False,
+            default_flow_style=False,
+        )
+    jinja_env.filters['toyaml'] = toyaml
     template = jinja_env.get_template(template.name)
     for line in sys.stdin:
         rec = json.loads(line)
         __data = dict(**rec)
+        __data = dict(**rec)
         if include_data_at_key:
-            rec[include_data_at_key] = yaml.safe_dump(
-                __data,
-                sort_keys=False,
-                default_flow_style=False,
-            )
+            rec[include_data_at_key] = __data
         rec.update(
             __datetime=datetime,
             __datetime_now=datetime.now(),
