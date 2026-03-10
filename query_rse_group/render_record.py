@@ -72,23 +72,18 @@ def cli(
 
     # register filter to become available within a template
     jinja_env.filters['toyaml'] = toyaml
+
     template = jinja_env.get_template(template.name)
     for line in sys.stdin:
         rec = json.loads(line)
-        __data = dict(**rec)
-        __data = dict(**rec)
-        if include_data_at_key:
-            rec[include_data_at_key] = __data
-        rec.update(
-            __datetime=datetime,
-            __datetime_now=datetime.now(),
-        )
         props = {
+            '__datetime': datetime,
+            '__datetime_now': datetime.now(),
             '__pid_curie_reference': rec['pid'].split(':', maxsplit=1)[1],
             '__rec': rec,
         }
         props.update(rec)
         output_filepath = Path(output_filename_template.format(**props))
         output_filepath.parent.mkdir(parents=True, exist_ok=True)
-        rendered_rec = template.render(**rec)
+        rendered_rec = template.render(**props)
         output_filepath.write_text(rendered_rec)
