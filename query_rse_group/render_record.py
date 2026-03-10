@@ -23,6 +23,16 @@ def toyaml(input):
     )
 
 
+def homogenize_annotations(rec):
+    annotations = rec.get('annotations', {})
+    if not annotations:
+        return
+    rec['annotations'] = {
+        k: v['annotation_value'] if isinstance(v, dict) else v
+        for k, v in annotations.items()
+    }
+
+
 @click.command('render-record')
 @click.argument(
     'template',
@@ -35,6 +45,8 @@ def toyaml(input):
 )
 @click.argument(
     'output-filename-template',
+    required=True,
+    nargs=-1,
 )
 @click.option(
     '--jinja-block-delims',
@@ -69,6 +81,23 @@ def cli(
 
     A `toyaml` filter is provided in addition to the standard Jinja filters.
     It can be used to convert any object to a YAML-compliant string.
+
+    Two command takes two mandatory arguments: 1) a path to the template
+    to render, and 2) a template-string to construct the output filename
+    for an individual record. This template-string is parameterized with
+    same variables as the template itself.
+
+    More than one output file name template-string can be given. In this
+    case, they will be tried in order, and the first one to successfully
+    instantiate will be used. The following example shows how a particular
+    annotation tag can be used to determine a path, and fall back on a
+    generic default, if that does not work, because the annotation tag is
+    not present.
+
+    \b
+      qri render-record <template> \\
+          'content/{annotations[target_id]}/_index.md' \\
+          'content/{__pid_curie_reference}/_index.md'
     """
     template_dir = template.parent if template.parents else Path.cwd()
     jinja_env = Environment(
@@ -90,6 +119,7 @@ def cli(
     template = jinja_env.get_template(template.name)
     for line in sys.stdin:
         rec = json.loads(line)
+        homogenize_annotations(rec)
         props = {
             '__datetime': datetime,
             '__datetime_now': datetime.now(),
@@ -97,7 +127,17 @@ def cli(
             '__rec': rec,
         }
         props.update(rec)
-        output_filepath = Path(output_filename_template.format(**props))
+        output_filepath = None
+        for ofnt in output_filename_template:
+            try:
+                output_filepath = Path(ofnt.format(**props))
+                break
+            except Exception:
+                pass
+        if output_filepath is None:
+            msg = 'All given output filename templates errored on record'
+            raise ValueError(msg)
+        print(output_filepath)
         output_filepath.parent.mkdir(parents=True, exist_ok=True)
         rendered_rec = template.render(**props)
         output_filepath.write_text(rendered_rec)
