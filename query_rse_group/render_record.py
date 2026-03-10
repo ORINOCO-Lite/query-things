@@ -55,6 +55,20 @@ def cli(
 
     This is a generic helper with no understanding of the nature of the
     provided Jinja2 template.
+
+    The values corresponding to all top-level keys of a record are made
+    available as direct variables for template rendering unsing the
+    respective as a variable name. In addition, the following variables
+    are also provided:
+
+    \b
+    __datetime: Python's `datetime` (`from datatime import datetime`)
+    __datetime_now: `datetime.now()`,
+    __pid_curie_reference: the non-prefix part of a CURIE-type record PID
+    __rec: the entire record as a single object
+
+    A `toyaml` filter is provided in addition to the standard Jinja filters.
+    It can be used to convert any object to a YAML-compliant string.
     """
     template_dir = template.parent if template.parents else Path.cwd()
     jinja_env = Environment(
