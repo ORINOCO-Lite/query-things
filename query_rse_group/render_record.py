@@ -44,21 +44,12 @@ def toyaml(input):
 )
 @click.option('--jinja-statement-marker', default=default_statement_marker)
 @click.option('--jinja-comment-marker', default=default_comment_marker)
-@click.option(
-    '--include-data-at-key',
-    default=None,
-    help="""\
-Make the record available to the jinja template 
-as a dictionary accessible at a specific key
-"""
-)
 def cli(
     template: Path,
     output_filename_template: str,
     jinja_block_delims: tuple[str, str] = default_inlineblock_delims,
     jinja_statement_marker: str = default_statement_marker,
     jinja_comment_marker: str = default_comment_marker,
-    include_data_at_key: str = None,
 ):
     """Render a template with a metadata record as input
 
@@ -94,6 +85,7 @@ def cli(
         )
         props = {
             '__pid_curie_reference': rec['pid'].split(':', maxsplit=1)[1],
+            '__rec': rec,
         }
         props.update(rec)
         output_filepath = Path(output_filename_template.format(**props))
