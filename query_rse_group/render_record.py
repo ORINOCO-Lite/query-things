@@ -13,6 +13,16 @@ default_inlineblock_delims = default=('{', '}')
 default_statement_marker = '%'
 default_comment_marker = '#'
 
+
+def toyaml(input):
+    """Custom filter to convert an object to a YAML string"""
+    return yaml.safe_dump(
+        input,
+        sort_keys=False,
+        default_flow_style=False,
+    )
+
+
 @click.command('render-record')
 @click.argument(
     'template',
@@ -68,13 +78,8 @@ def cli(
         #line_statement_prefix = f'',
         #line_comment_prefix = f'',
     )
-    def toyaml(input):
-        """Custom filter to convert an object to a YAML string"""
-        return yaml.safe_dump(
-            input,
-            sort_keys=False,
-            default_flow_style=False,
-        )
+
+    # register filter to become available within a template
     jinja_env.filters['toyaml'] = toyaml
     template = jinja_env.get_template(template.name)
     for line in sys.stdin:
