@@ -1,5 +1,5 @@
-# (Demo) query and exporter implementations for the RSE group data model
+# Query and export tooling for Things-derived data models
 
 ## Data model
 
-https://concepts.datalad.org/s/demo-rse-group
+https://concepts.datalad.org/

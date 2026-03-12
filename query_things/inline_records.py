@@ -2,7 +2,7 @@ import click
 import json
 import sys
 
-from query_rse_group import (
+from query_things import (
     stdargs,
     _get_rec_from_any_collection,
 )

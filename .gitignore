@@ -1,4 +1,4 @@
-query_rse_group/_version.py
+query_things/_version.py
 __pycache__/
 *.py[cod]
 *$py.class

@@ -2,7 +2,7 @@ import click
 from click_option_group import optgroup, MutuallyExclusiveOptionGroup
 import json
 
-from query_rse_group import (
+from query_things import (
     stdargs,
 )
 

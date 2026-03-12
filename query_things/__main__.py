@@ -1,5 +1,5 @@
 import click
-from query_rse_group import (
+from query_things import (
     filter_linked_pid,
     filter_links_pid,
     inject_links_pid,
@@ -12,7 +12,7 @@ from query_rse_group import (
 
 @click.group()
 def main():
-    """Tools to query, filter, and process research information schema metadata
+    """Tools to query, filter, and process Things-compliant metadata
     """
 
 

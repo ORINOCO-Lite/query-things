@@ -6,9 +6,9 @@ requires = [
 build-backend = "hatchling.build"
 
 [project]
-name = "query-rse-group"
+name = "query-things"
 dynamic = ["version"]
-description = '(Demo) query and exporter implementations for the RSE group data model'
+description = 'Query and export tooling for Things-derived data models'
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"
@@ -52,14 +52,15 @@ dependencies = [
 ]
 
 [project.scripts]
-qrg = "query_rse_group.__main__:main"
-qri = "query_rse_group.__main__:main"
+qrg = "query_things.__main__:main"
+qri = "query_things.__main__:main"
+query-things = "query_things.__main__:main"
 
 [project.urls]
-Homepage = "https://hub.psychoinformatics.de/orinoco/query-research-information"
-Documentation = "https://hub.psychoinformatics.de/orinoco/query-research-information#readme"
-Issues = "https://hub.psychoinformatics.de/orinoco/query-research-information/issues"
-Source = "https://hub.psychoinformatics.de/orinoco/query-research-information"
+Homepage = "https://hub.psychoinformatics.de/orinoco/query-things"
+Documentation = "https://hub.psychoinformatics.de/orinoco/query-things#readme"
+Issues = "https://hub.psychoinformatics.de/orinoco/query-things/issues"
+Source = "https://hub.psychoinformatics.de/orinoco/query-things"
 
 [tool.hatch.metadata]
 allow-direct-references = true
@@ -68,7 +69,7 @@ allow-direct-references = true
 source = "vcs"
 
 [tool.hatch.build.hooks.vcs]
-version-file = "query_rse_group/_version.py"
+version-file = "query_things/_version.py"
 
 [tool.hatch.build.targets.sdist]
 exclude = [
@@ -83,7 +84,7 @@ extra-dependencies = [
 ]
 [tool.hatch.envs.types.scripts]
 check = [
-  "mypy --install-types --non-interactive --python-version 3.10 --pretty --show-error-context {args:query_rse_group}",
+  "mypy --install-types --non-interactive --python-version 3.10 --pretty --show-error-context {args:query_things}",
 ]
 
 [tool.hatch.envs.cz]
