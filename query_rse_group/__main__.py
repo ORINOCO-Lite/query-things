@@ -6,6 +6,7 @@ from query_rse_group import (
     inline_records,
     render_record,
     cache,
+    list,
 )
 
 
@@ -22,6 +23,7 @@ for mod in (
     inline_records,
     render_record,
     cache,
+    list,
 ):
     main.add_command(getattr(mod, 'cli'))
 

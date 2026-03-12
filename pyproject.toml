@@ -46,6 +46,7 @@ classifiers = [
 ]
 dependencies = [
   "click",
+  "click-option-group",
   "dump-things-pyclient @ git+https://hub.psychoinformatics.de/orinoco/dump-things-pyclient.git@master",
   "jinja2",
 ]
