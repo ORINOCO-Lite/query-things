@@ -41,6 +41,8 @@ def cli(
 
     # for all other scenarios we need to loop over all records
     for rec in record_cache.values():
+        if rec is None:
+            continue
         if cls and rec.get('schema_type') not in cls:
             continue
         click.echo(json.dumps(rec), nl=True)
