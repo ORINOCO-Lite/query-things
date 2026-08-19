@@ -82,7 +82,7 @@ def cli(
     record_cache: dict,
     collection=('public',),
 ):
-    """Resolve and inline metadata linked to dataset records.
+    """DEPRECATED: use `inline-things`
     """
     for line in sys.stdin:
         rec = json.loads(line)
