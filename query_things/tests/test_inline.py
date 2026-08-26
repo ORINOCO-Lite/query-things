@@ -1,6 +1,5 @@
-import pytest
 
-from query_things.inline_things import walk, inline_json_objects
+from query_things.inline_things import inline_json_objects, walk
 
 
 def test_walk_inlines_string_reference_in_nested_dict():

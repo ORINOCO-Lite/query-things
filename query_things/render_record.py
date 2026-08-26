@@ -1,13 +1,14 @@
-import click
+import json
+import sys
 from datetime import datetime
+from pathlib import Path
+
+import click
+import yaml
 from jinja2 import (
     Environment,
     FileSystemLoader,
 )
-import json
-from pathlib import Path
-import sys
-import yaml
 
 default_inlineblock_delims = default=('{', '}')
 default_statement_marker = '%'

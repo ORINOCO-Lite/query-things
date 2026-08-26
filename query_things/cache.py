@@ -1,6 +1,7 @@
-import click
 import json
 import sys
+
+import click
 
 from query_things import (
     stdargs,

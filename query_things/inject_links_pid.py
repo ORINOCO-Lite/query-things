@@ -1,15 +1,14 @@
 
-import click
 import json
 import sys
 
+import click
 from dump_things_pyclient.communicate import (
     collection_read_records_of_class,
 )
 
 from query_things import (
     stdargs,
-    _get_rec_from_any_collection,
 )
 
 

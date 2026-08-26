@@ -1,7 +1,7 @@
-import click
 import json
 from pathlib import Path
 
+import click
 from dump_things_pyclient.communicate import (
     collection_read_record_with_pid,
 )

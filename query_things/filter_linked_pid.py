@@ -1,7 +1,7 @@
-import click
 import json
 import sys
 
+import click
 from dump_things_pyclient.communicate import (
     collection_read_record_with_pid,
 )

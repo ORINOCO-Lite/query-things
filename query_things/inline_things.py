@@ -1,14 +1,14 @@
-from collections.abc import Callable, Sequence
-from functools import partial
 import json
 import sys
+from collections.abc import Callable, Sequence
+from functools import partial
 from typing import Any
 
 import click
 
 from query_things import (
-    stdargs,
     _get_rec_from_any_collection,
+    stdargs,
 )
 
 

@@ -1,13 +1,14 @@
 import click
+
 from query_things import (
+    cache,
     filter_linked_pid,
     filter_links_pid,
     inject_links_pid,
     inline_records,
     inline_things,
-    render_record,
-    cache,
     list,
+    render_record,
 )
 
 
@@ -27,7 +28,7 @@ for mod in (
     cache,
     list,
 ):
-    main.add_command(getattr(mod, 'cli'))
+    main.add_command(mod.cli)
 
 
 if __name__ == '__main__':

@@ -1,6 +1,7 @@
-import click
-from click_option_group import optgroup, MutuallyExclusiveOptionGroup
 import json
+
+import click
+from click_option_group import MutuallyExclusiveOptionGroup, optgroup
 
 from query_things import (
     stdargs,
