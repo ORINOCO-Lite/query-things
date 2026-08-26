@@ -7,8 +7,10 @@ from query_things import (
     inject_links_pid,
     inline_records,
     inline_things,
-    list,
     render_record,
+)
+from query_things import (
+    list as list_cmd,
 )
 
 
@@ -25,7 +27,7 @@ for mod in (
     inline_things,
     render_record,
     cache,
-    list,
+    list_cmd,
 ):
     main.add_command(mod.cli)
 

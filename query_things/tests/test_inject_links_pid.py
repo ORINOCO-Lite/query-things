@@ -5,7 +5,6 @@ from click.testing import CliRunner
 
 from query_things.inject_links_pid import _proc_record, cli
 
-
 API_URL = 'https://example.test'
 
 
@@ -44,9 +43,7 @@ def linker_query(monkeypatch):
 
 
 @pytest.fixture
-def process_record(linker_query):
-    records_by_collection, _ = linker_query
-
+def process_record(linker_query):  # noqa: ARG001
     def _process(
         record,
         *,
@@ -94,7 +91,7 @@ def test_injects_linking_records_into_missing_property(
         inject='injected_people',
         link=('related',),
         class_name='Person',
-        token='secret-token',
+        token='secret-token',  # noqa: S106
     )
 
     assert record == {

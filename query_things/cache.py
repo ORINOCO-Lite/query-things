@@ -1,5 +1,6 @@
 import json
 import sys
+from contextlib import suppress
 
 import click
 
@@ -25,11 +26,9 @@ def cli(
     for line in sys.stdin:
         try:
             rec = json.loads(line)
-            try:
-                record_cache[rec['pid']] = rec
-            except KeyError:
+            with suppress(KeyError):
                 # silently ignore a record without a PID
-                pass
+                record_cache[rec['pid']] = rec
         except ValueError:
             # silently ignore non-JSON input
             pass

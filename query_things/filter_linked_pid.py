@@ -10,7 +10,7 @@ from query_things import stdargs
 
 
 @click.command('filter-linked-pid')
-# TODO maybe later to invert the filter
+# TODO: maybe later to invert the filter
 # @click.option('--ex
 @click.argument('collection', **stdargs['collection'])
 @click.argument('pid')
@@ -48,10 +48,10 @@ def cli(
     # this will make it easier to extend the matching (ie. with
     # time windows) later on
     linked = [
-        l if isinstance(l, dict) else {'object': l}
-        for l in (ref_prop if isinstance(ref_prop, list) else [ref_prop])
+        lnk if isinstance(lnk, dict) else {'object': lnk}
+        for lnk in (ref_prop if isinstance(ref_prop, list) else [ref_prop])
     ]
     for line in sys.stdin:
         rec = json.loads(line)
-        if any(l['object'] == rec['pid'] for l in linked):
+        if any(lnk['object'] == rec['pid'] for lnk in linked):
             click.echo(line, nl=False)
