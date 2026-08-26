@@ -34,6 +34,5 @@ for mod in (
 main.add_command(inline_records.cli, hidden=True)
 
 
-
 if __name__ == '__main__':
     main()

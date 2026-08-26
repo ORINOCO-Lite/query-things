@@ -13,11 +13,11 @@ def iter_json_objects():
         try:
             rec = json.loads(stripped)
         except json.JSONDecodeError as e:
-            msg = f"Invalid JSON on line {lineno}: {e}"
+            msg = f'Invalid JSON on line {lineno}: {e}'
             raise click.ClickException(msg) from e
 
         if not isinstance(rec, dict):
-            msg = f"Line {lineno} must be a JSON object"
+            msg = f'Line {lineno} must be a JSON object'
             raise click.ClickException(msg)
 
         pid = rec.get('pid')
