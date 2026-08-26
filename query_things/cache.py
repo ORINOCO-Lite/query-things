@@ -4,7 +4,7 @@ from contextlib import suppress
 
 import click
 
-from query_things import (
+from query_things.common import (
     stdargs,
 )
 

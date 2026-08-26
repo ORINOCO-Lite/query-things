@@ -6,7 +6,7 @@ from dump_things_pyclient.communicate import (  # type: ignore[import-untyped]
     collection_read_records_of_class,
 )
 
-from query_things import (
+from query_things.common import (
     iter_json_objects,
     stdargs,
 )

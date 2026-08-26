@@ -10,7 +10,7 @@ from jinja2 import (
     FileSystemLoader,
 )
 
-from query_things import iter_json_objects
+from query_things.common import iter_json_objects
 
 default_inlineblock_delims = default = ('{', '}')
 default_statement_marker = '%'

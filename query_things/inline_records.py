@@ -3,7 +3,7 @@ import sys
 
 import click
 
-from query_things import (
+from query_things.common import (
     _get_rec_from_any_collection,
     stdargs,
 )

@@ -3,7 +3,7 @@ import json
 import click
 from click_option_group import MutuallyExclusiveOptionGroup, optgroup
 
-from query_things import (
+from query_things.common import (
     stdargs,
 )
 
