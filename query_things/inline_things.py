@@ -31,7 +31,7 @@ def walk(
         value = container[key]
 
         if isinstance(value, str) and ':' in value:
-            resolved = get_obj(pid=value)
+            resolved = get_obj(value)
             if resolved is not None:
                 container[key] = resolved
                 value = resolved
