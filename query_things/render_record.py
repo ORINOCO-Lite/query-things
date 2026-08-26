@@ -151,7 +151,7 @@ def _proc_rec(
         try:
             output_filepath = Path(ofnt.format(**props))
             break
-        except Exception as e:  # noqa: BLE001
+        except (KeyError, IndexError, ValueError) as e:
             print(e, file=sys.stderr)  # noqa: T201
     if output_filepath is None:
         msg = 'All given output filename templates errored on record'
