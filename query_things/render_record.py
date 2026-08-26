@@ -106,7 +106,7 @@ def cli(
           'content/{annotations[target_id]}/_index.md' \\
           'content/{__pid_curie_reference}/_index.md'
     """
-    template_dir = template.parent if template.parents else Path.cwd()
+    template_dir = template.parent or Path.cwd()
     jinja_env = Environment(
         loader=FileSystemLoader(template_dir),
         block_start_string=f'{jinja_block_delims[0]}{jinja_statement_marker}',
