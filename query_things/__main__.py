@@ -5,7 +5,6 @@ from query_things import (
     filter_linked_pid,
     filter_links_pid,
     inject_links_pid,
-    inline_records,
     inline_things,
     render_record,
 )
@@ -23,7 +22,6 @@ for mod in (
     filter_linked_pid,
     filter_links_pid,
     inject_links_pid,
-    inline_records,
     inline_things,
     render_record,
     cache,
