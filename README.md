@@ -9,7 +9,7 @@ resolves linked objects, and converts graph-oriented metadata into structures
 that can be consumed by templates, websites, reports, catalogs, and other
 automated workflows.  Its main purpose is therefore *controlled
 denormalization*: preserving the semantics of a linked metadata graph while
-making selected portions convenient to use in structure data workflows.
+making selected portions convenient to use in structured data workflows.
 
 
 ## Supported operations

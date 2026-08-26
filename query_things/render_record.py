@@ -81,7 +81,7 @@ def cli(
     are also provided:
 
     \b
-    __datetime: Python's `datetime` (`from datatime import datetime`)
+    __datetime: Python's `datetime` (`from datetime import datetime`)
     __datetime_now: `datetime.now()`,
     __pid_curie_reference: the non-prefix part of a CURIE-type record PID
     __rec: the entire record as a single object
@@ -89,7 +89,7 @@ def cli(
     A `toyaml` filter is provided in addition to the standard Jinja filters.
     It can be used to convert any object to a YAML-compliant string.
 
-    Two command takes two mandatory arguments: 1) a path to the template
+    This command takes two mandatory arguments: 1) a path to the template
     to render, and 2) a template-string to construct the output filename
     for an individual record. This template-string is parameterized with
     same variables as the template itself.
