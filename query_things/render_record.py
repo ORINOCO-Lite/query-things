@@ -13,7 +13,7 @@ from jinja2 import (
 
 from query_things.common import iter_json_objects
 
-default_inlineblock_delims = default = ('{', '}')
+default_inlineblock_delims = ('{', '}')
 default_statement_marker = '%'
 default_comment_marker = '#'
 
