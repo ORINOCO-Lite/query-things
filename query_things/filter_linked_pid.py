@@ -6,7 +6,7 @@ from dump_things_pyclient.communicate import (
     collection_read_record_with_pid,
 )
 
-from query_things import stdargs
+from query_things.common import stdargs
 
 
 @click.command('filter-linked-pid')

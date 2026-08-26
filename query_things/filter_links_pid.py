@@ -32,7 +32,6 @@ from query_things.common import (
     '--collection',
     multiple=True,
     help='Collection to query. Can be given multiple times.',
-    default=('public',),
     **stdargs['collection'],
 )
 def cli(
