@@ -16,6 +16,7 @@ from query_things import (
     metavar='<PROPERTY> <PID>',
     multiple=True,
     nargs=2,
+    required=True,
 )
 @click.option(
     '--recursive',
