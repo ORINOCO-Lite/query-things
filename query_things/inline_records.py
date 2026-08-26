@@ -54,7 +54,7 @@ def _resolve_records(
     return None
 
 
-@click.command('inline-records')
+@click.command('inline-records', hidden=True)
 @click.option(
     '-p',
     '--property',
