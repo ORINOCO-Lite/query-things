@@ -49,6 +49,7 @@ dependencies = [
   "click-option-group",
   "dump-things-pyclient @ git+https://hub.psychoinformatics.de/orinoco/dump-things-pyclient.git@master",
   "jinja2",
+  "pyyaml",
 ]
 
 [project.scripts]
