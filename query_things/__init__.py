@@ -20,6 +20,10 @@ def _handle_record_cache(ctx, _, value) -> {}:
         # ok if it doesn't exist yet. If it doesn't load, we ignore it
         cache = {}
 
+    # protect against invalid cache content
+    if not isinstance(cache, dict):
+        cache = {}
+
     @ctx.call_on_close
     def dump_cache():
         if not cache:
