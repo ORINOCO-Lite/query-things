@@ -1,4 +1,3 @@
-import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -157,7 +156,7 @@ def _proc_rec(
             output_filepath = Path(ofnt.format(**props))
             break
         except (KeyError, IndexError, ValueError) as e:
-            print(e, file=sys.stderr)  # noqa: T201
+            click.echo(str(e), err=True)
     if output_filepath is None:
         msg = 'All given output filename templates errored on record'
         raise ValueError(msg)
