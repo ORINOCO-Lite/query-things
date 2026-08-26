@@ -23,13 +23,16 @@ for mod in (
     filter_linked_pid,
     filter_links_pid,
     inject_links_pid,
-    inline_records,
     inline_things,
     render_record,
     cache,
     list_cmd,
 ):
     main.add_command(mod.cli)
+
+# accept, but no longer show
+main.add_command(inline_records.cli, hidden=True)
+
 
 
 if __name__ == '__main__':
