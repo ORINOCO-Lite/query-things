@@ -1,8 +1,30 @@
+from collections.abc import (
+    Callable,
+    Sequence,
+)
 from dump_things_pyclient.communicate import (
     collection_read_record_with_pid,
 )
 
 from query_things.common.cache import RecordCache
+
+
+def make_record_resolver(
+    api_url: str,
+    collections: Sequence[str],
+    cache: RecordCache,
+    token: str | None = None,
+) -> Callable[[str], dict | None]:
+    def resolver(pid: str) -> dict | None:
+        return _get_rec_from_any_collection(
+            api_url=api_url,
+            collections=collections,
+            pid=pid,
+            cache=cache,
+            token=token,
+        )
+
+    return resolver
 
 
 def _get_rec_from_any_collection(

@@ -1,9 +1,10 @@
 import click
 
 from query_things.common import (
-    _get_rec_from_any_collection,
     RecordCache,
+    all_records_have_links,
     iter_json_objects,
+    make_record_resolver,
     stdargs,
 )
 
@@ -42,52 +43,18 @@ def cli(
 ):
     """Filter records by links to a specific PID"""
 
-    def _pid_match(val: str | dict, pid: str, recursive: bool, via: str):  # noqa: FBT001
-        if isinstance(val, dict):
-            val = val['object']
-
-        if pid == val:
-            return True
-
-        if recursive:
-            rec = _get_rec_from_any_collection(
-                api_url,
-                collection,
-                val,
-                record_cache,
-                token=token,
-            )
-            return _does_link(
-                rec,
-                pid,
-                via,
-                recursive=True,
-            )
-
-        return False
-
-    def _does_link(
-        rec: dict,
-        target_pid: str,
-        via: str,
-        recursive: bool,  # noqa: FBT001
-    ) -> bool:
-        if via not in rec:
-            # no chance
-            return False
-
-        prop = rec[via]
-        if not isinstance(prop, (list, tuple)):
-            prop = [prop]
-
-        return any(_pid_match(val, target_pid, recursive, via) for val in prop)
+    resolver = make_record_resolver(
+        api_url=api_url,
+        collections=collection,
+        cache=record_cache,
+        token=token,
+    )
 
     for line, rec in iter_json_objects():
-        report = True
-        for prop_id, pid in link:
-            if not _does_link(rec, pid, prop_id, recursive):
-                report = False
-                break
-        if not report:
-            continue
-        click.echo(line, nl=False)
+        if all_records_have_links(
+            rec,
+            link,
+            resolver=resolver,
+            recursive=recursive,
+        ):
+            click.echo(line, nl=False)

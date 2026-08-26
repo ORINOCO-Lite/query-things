@@ -47,7 +47,7 @@ class TestFilterLinksPidBasic:
         """Test filtering a record that matches the link criteria."""
         input_data = json.dumps(sample_record)
 
-        with patch('query_things.filter_links_pid._get_rec_from_any_collection'):
+        with patch('query_things.common._get_rec_from_any_collection'):
             result = runner.invoke(
                 cli,
                 [
@@ -67,7 +67,7 @@ class TestFilterLinksPidBasic:
         """Test filtering a record that doesn't match the link criteria."""
         input_data = json.dumps(sample_record)
 
-        with patch('query_things.filter_links_pid._get_rec_from_any_collection'):
+        with patch('query_things.common._get_rec_from_any_collection'):
             result = runner.invoke(
                 cli,
                 [
@@ -89,7 +89,7 @@ class TestFilterLinksPidBasic:
         record2 = {'pid': 'rec2', 'links_to': {'object': 'pid456'}}
         input_data = f'{json.dumps(record1)}\n{json.dumps(record2)}\n'
 
-        with patch('query_things.filter_links_pid._get_rec_from_any_collection'):
+        with patch('query_things.common._get_rec_from_any_collection'):
             result = runner.invoke(
                 cli,
                 [
@@ -115,7 +115,7 @@ class TestFilterLinksPidBasic:
         }
         input_data = json.dumps(record)
 
-        with patch('query_things.filter_links_pid._get_rec_from_any_collection'):
+        with patch('query_things.common._get_rec_from_any_collection'):
             result = runner.invoke(
                 cli,
                 [
@@ -139,7 +139,7 @@ class TestFilterLinksPidBasic:
         record = {'pid': 'rec1', 'tags': ['tag1', 'pid123', 'tag3']}
         input_data = json.dumps(record)
 
-        with patch('query_things.filter_links_pid._get_rec_from_any_collection'):
+        with patch('query_things.common._get_rec_from_any_collection'):
             result = runner.invoke(
                 cli,
                 [
@@ -159,7 +159,7 @@ class TestFilterLinksPidBasic:
         """Test that recursive flag is accepted."""
         input_data = json.dumps(sample_record)
 
-        with patch('query_things.filter_links_pid._get_rec_from_any_collection'):
+        with patch('query_things.common._get_rec_from_any_collection'):
             result = runner.invoke(
                 cli,
                 [
@@ -180,7 +180,7 @@ class TestFilterLinksPidBasic:
         input_data = json.dumps(sample_record)
 
         with patch(
-            'query_things.filter_links_pid._get_rec_from_any_collection'
+            'query_things.common._get_rec_from_any_collection'
         ) as mock_get:
             result = runner.invoke(
                 cli,
@@ -203,7 +203,7 @@ class TestFilterLinksPidBasic:
         record = {'pid': 'rec1', 'title': 'No links'}
         input_data = json.dumps(record)
 
-        with patch('query_things.filter_links_pid._get_rec_from_any_collection'):
+        with patch('query_things.common._get_rec_from_any_collection'):
             result = runner.invoke(
                 cli,
                 [

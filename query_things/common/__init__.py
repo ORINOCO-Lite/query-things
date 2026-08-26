@@ -2,7 +2,10 @@ from pathlib import Path
 
 import click
 
-from .api import _get_rec_from_any_collection  # noqa: TID252
+from .api import (
+    _get_rec_from_any_collection,  # noqa: TID252
+    make_record_resolver,
+)
 from .cache import (  # noqa: TID252
     _handle_record_cache,
     RecordCache,
