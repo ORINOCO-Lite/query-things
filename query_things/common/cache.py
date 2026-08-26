@@ -9,8 +9,6 @@ from typing import Any
 
 
 class RecordCache:
-    _MISSING = object()
-
     def __init__(
         self,
         path: Path | None = None,
@@ -35,13 +33,8 @@ class RecordCache:
 
         return cls(path=path, data=data)
 
-    def get(self, pid: str, default: Any = _MISSING) -> Any:
-        try:
-            return self[pid]
-        except KeyError:
-            if default is RecordCache._MISSING:
-                raise
-            return default
+    def get(self, pid: str, default: Any = None) -> Any:
+        return self._data.get(pid, default)
 
     def keys(self) -> KeysView[str]:
         return self._data.keys()

@@ -148,13 +148,6 @@ def test_get_missing_key_with_explicit_none_default():
     assert cache.get('missing', None) is None
 
 
-def test_get_missing_key_without_default_raises():
-    cache = RecordCache()
-
-    with pytest.raises(KeyError, match='missing'):
-        cache.get('missing')
-
-
 def test_load_none_path_returns_empty_cache():
     cache = RecordCache.load(None)
 
