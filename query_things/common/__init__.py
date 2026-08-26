@@ -5,11 +5,13 @@ import click
 from .api import _get_rec_from_any_collection  # noqa: TID252
 from .cache import _handle_record_cache  # noqa: TID252
 from .io import iter_json_objects  # noqa: TID252
+from .records import homogenize_annotations  # noqa: TID252
 
 __all__ = [
     '_get_rec_from_any_collection',
     '_handle_record_cache',
     'iter_json_objects',
+    'homogenize_annotations',
     'stdargs',
 ]
 

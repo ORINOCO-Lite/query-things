@@ -10,7 +10,10 @@ from jinja2 import (
     select_autoescape,
 )
 
-from query_things.common import iter_json_objects
+from query_things.common import (
+    homogenize_annotations,
+    iter_json_objects,
+)
 
 default_inlineblock_delims = ('{', '}')
 default_statement_marker = '%'
@@ -24,21 +27,6 @@ def toyaml(obj):
         sort_keys=False,
         default_flow_style=False,
     )
-
-
-def homogenize_annotations(rec):
-    annotations = rec.get('annotations')
-    if not isinstance(annotations, dict):
-        return
-
-    rec['annotations'] = {
-        k: (
-            v['annotation_value']
-            if isinstance(v, dict) and 'annotation_value' in v
-            else v
-        )
-        for k, v in annotations.items()
-    }
 
 
 @click.command('render-record')
