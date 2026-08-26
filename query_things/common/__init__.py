@@ -2,7 +2,7 @@ from pathlib import Path
 
 import click
 
-from .api import (
+from .api import (  # noqa: TID252
     make_record_resolver,
 )
 from .cache import (  # noqa: TID252
@@ -10,7 +10,7 @@ from .cache import (  # noqa: TID252
     _handle_record_cache,
 )
 from .io import iter_json_objects  # noqa: TID252
-from .linking import (
+from .linking import (  # noqa: TID252
     all_records_have_links,
     iter_link_pids,
     record_has_link,

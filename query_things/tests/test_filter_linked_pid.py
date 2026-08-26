@@ -17,7 +17,7 @@ def run_filter(
     pid='project-1',
     property_name='related_people',
     api_url='https://example.test',
-    token='test-token',
+    token='test-token',  # noqa: S107
 ):
     """Run the Click callback with mocked API access and stdin."""
     collection_read_record = Mock(return_value=reference)
@@ -60,14 +60,14 @@ def test_fetches_reference_record_with_expected_arguments(
         pid='project-1',
         property_name='related_people',
         api_url='https://api.example.test',
-        token='secret-token',
+        token='secret-token',  # noqa: S106
     )
 
     api_call.assert_called_once_with(
         service_url='https://api.example.test',
         collection='people',
         pid='project-1',
-        token='secret-token',
+        token='secret-token',  # noqa: S106
     )
     assert result.out == ''
     assert result.err == ''
