@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+import sys
 
 import click
 from dump_things_pyclient.communicate import (
@@ -76,3 +77,30 @@ def _get_rec_from_any_collection(
     # yes, also cache that we asked and nothing was there
     cache[pid] = None
     return None
+
+
+def iter_json_objects():
+    for lineno, line in enumerate(sys.stdin, 1):
+        stripped = line.strip()
+        if not stripped:
+            continue
+
+        try:
+            rec = json.loads(stripped)
+        except json.JSONDecodeError as e:
+            raise click.ClickException(
+                f"Invalid JSON on line {lineno}: {e}"
+            ) from e
+
+        if not isinstance(rec, dict):
+            raise click.ClickException(
+                f"Line {lineno} must be a JSON object"
+            )
+
+        pid = rec.get('pid')
+        if not isinstance(pid, str):
+            raise click.ClickException(
+                f"Line {lineno} must have a string 'pid'"
+            )
+
+        yield line, rec

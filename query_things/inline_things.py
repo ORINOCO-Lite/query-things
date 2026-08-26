@@ -1,5 +1,4 @@
 import json
-import sys
 from collections.abc import Callable, Sequence
 from functools import partial
 from typing import Any
@@ -8,6 +7,7 @@ import click
 
 from query_things import (
     _get_rec_from_any_collection,
+    iter_json_objects,
     stdargs,
 )
 
@@ -125,7 +125,6 @@ def cli(
 
     paths = [tuple(p.split('::')) for p in path]
 
-    for line in sys.stdin:
-        rec = json.loads(line)
+    for _, rec in iter_json_objects():
         inline_json_objects(rec, paths, get_obj)
         click.echo(json.dumps(rec), nl=True)

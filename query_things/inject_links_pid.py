@@ -8,6 +8,7 @@ from dump_things_pyclient.communicate import (  # type: ignore[import-untyped]
 )
 
 from query_things import (
+    iter_json_objects,
     stdargs,
 )
 
@@ -47,8 +48,7 @@ def cli(
     collection=('public',),
 ):
     """Inject records that link to each input record"""
-    for line in sys.stdin:
-        rec = json.loads(line)
+    for _, rec in iter_json_objects():
         _proc_record(
             rec,
             inject=inject,

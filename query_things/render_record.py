@@ -1,4 +1,3 @@
-import json
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -10,6 +9,7 @@ from jinja2 import (
     Environment,
     FileSystemLoader,
 )
+from query_things import iter_json_objects
 
 default_inlineblock_delims = default = ('{', '}')
 default_statement_marker = '%'
@@ -119,8 +119,7 @@ def cli(
     jinja_env.filters['toyaml'] = toyaml
 
     tmpl = jinja_env.get_template(template.name)
-    for line in sys.stdin:
-        rec = json.loads(line)
+    for _, rec in iter_json_objects():
         _proc_rec(
             rec,
             tmpl,
