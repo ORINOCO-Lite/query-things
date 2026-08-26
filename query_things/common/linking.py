@@ -35,7 +35,7 @@ def iter_link_pids(value: Any, key: str = PID_KEY) -> Iterable[str]:
 
 def record_has_link(
     rec: dict | None,
-    property: str,
+    prop: str,
     target_pid: str,
     resolver: Callable[[str], dict | None] | None = None,
     *,
@@ -43,20 +43,20 @@ def record_has_link(
     visited: frozenset[str] | None = None,
 ) -> bool:
     """
-    Return True if rec has a link to target_pid via property.
+    Return True if rec has a link to target_pid via prop.
 
     If recursive=True and resolver is provided, follow linked PIDs.
     """
     if rec is None:
         return False
 
-    if property not in rec:
+    if prop not in rec:
         return False
 
     if visited is None:
         visited = frozenset()
 
-    for pid in iter_link_pids(rec.get(property)):
+    for pid in iter_link_pids(rec.get(prop)):
         if pid == target_pid:
             return True
 
@@ -64,7 +64,7 @@ def record_has_link(
             linked_rec = resolver(pid)
             if record_has_link(
                 linked_rec,
-                property,
+                prop,
                 target_pid,
                 resolver=resolver,
                 recursive=True,
@@ -85,10 +85,10 @@ def all_records_have_links(
     return all(
         record_has_link(
             rec,
-            property,
+            prop,
             pid,
             resolver=resolver,
             recursive=recursive,
         )
-        for property, pid in links
+        for prop, pid in links
     )
