@@ -5,7 +5,7 @@ from dump_things_pyclient.communicate import (
 
 def _get_rec_from_any_collection(
     api_url: str,
-    collections: tuple[str],
+    collections: tuple[str, ...],
     pid: str,
     cache: dict,
     token: str | None = None,

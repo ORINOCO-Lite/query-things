@@ -14,7 +14,7 @@ def _resolve_records(
     rec: dict,
     api_url: str,
     token: str | None,
-    collections: tuple[str],
+    collections: tuple[str, ...],
     cache: dict,
     pid_prop: str = 'object',
 ) -> None:
@@ -80,7 +80,7 @@ multivalued.
     **stdargs['collection'],
 )
 def cli(
-    property: tuple[str],  # noqa: A002
+    property: tuple[str, ...],  # noqa: A002
     api_url: str,
     token: str | None,
     record_cache: dict,

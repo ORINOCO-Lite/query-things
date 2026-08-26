@@ -67,8 +67,8 @@ def _proc_record(
     rec: dict[str, Any],
     *,
     inject: str,
-    collections: tuple[str],
-    link: tuple[str],
+    collections: tuple[str, ...],
+    link: tuple[str, ...],
     api_url: str,
     class_name: str | None = None,
     token: str | None = None,
@@ -97,7 +97,7 @@ def _proc_record(
 
 
 def get_any_thing_that_links_pid_via_x(
-    link: tuple[str],
+    link: tuple[str, ...],
     class_name: str | None,
     api_url: str,
     collection: str,

@@ -93,7 +93,7 @@ path (including intermediate levels) may be multivalued.
     **stdargs['collection'],
 )
 def cli(
-    path: tuple[str],
+    path: tuple[str, ...],
     api_url: str,
     token: str | None,
     record_cache: dict,
