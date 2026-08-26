@@ -95,7 +95,7 @@ path (including intermediate levels) may be multivalued.
 def cli(
     path: tuple[str],
     api_url: str,
-    token: str,
+    token: str | None,
     record_cache: dict,
     collection=('public',),
 ):

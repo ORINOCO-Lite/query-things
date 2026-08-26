@@ -13,7 +13,7 @@ def _resolve_records(
     property: str,  # noqa: A002
     rec: dict,
     api_url: str,
-    token: str,
+    token: str | None,
     collections: tuple[str],
     cache: dict,
     pid_prop: str = 'object',
@@ -82,7 +82,7 @@ multivalued.
 def cli(
     property: tuple[str],  # noqa: A002
     api_url: str,
-    token: str,
+    token: str | None,
     record_cache: dict,
     collection=('public',),
 ):
