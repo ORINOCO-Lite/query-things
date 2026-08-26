@@ -12,6 +12,27 @@ from query_things.common import (
 )
 
 
+def is_pid_like(value: object) -> bool:
+    return isinstance(value, str) and bool(value) and ":" in value
+
+
+def inline_value(
+    value: Any,
+    get_obj: Callable[[str], dict[str, Any] | None],
+) -> Any:
+    if isinstance(value, str):
+        if is_pid_like(value):
+            resolved = get_obj(value)
+            if resolved is not None:
+                return resolved
+        return value
+
+    if isinstance(value, list):
+        return [inline_value(item, get_obj) for item in value]
+
+    return value
+
+
 def walk(
     container: Any,
     path: tuple[str, ...],
@@ -30,13 +51,8 @@ def walk(
     if isinstance(container, dict) and key in container:
         value = container[key]
 
-        if isinstance(value, str) and ':' in value:
-            resolved = get_obj(value)
-            if resolved is not None:
-                container[key] = resolved
-                value = resolved
-
         if len(path) == 1:
+            container[key] = inline_value(value, get_obj)
             return
 
         if isinstance(value, dict):
