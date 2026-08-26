@@ -156,6 +156,12 @@ quote-style = "single"
   "N802",
 ]
 
+[tool.coverage.report]
+omit = [
+  # skip generated jinja2 templates
+  "*.j2",
+]
+
 [tool.commitizen]
 name = "cz_customize"
 tag_format = "v$version"
