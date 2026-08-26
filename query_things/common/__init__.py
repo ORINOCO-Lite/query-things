@@ -3,7 +3,6 @@ from pathlib import Path
 import click
 
 from .api import (
-    _get_rec_from_any_collection,  # noqa: TID252
     make_record_resolver,
 )
 from .cache import (  # noqa: TID252
@@ -19,13 +18,13 @@ from .linking import (
 from .records import homogenize_annotations  # noqa: TID252
 
 __all__ = [
-    '_get_rec_from_any_collection',
     '_handle_record_cache',
     'RecordCache',
     'all_records_have_links',
     'iter_json_objects',
     'iter_link_pids',
     'homogenize_annotations',
+    'make_record_resolver',
     'record_has_link',
     'stdargs',
 ]

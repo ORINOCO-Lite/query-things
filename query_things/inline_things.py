@@ -1,14 +1,13 @@
 import json
 from collections.abc import Callable, Sequence
-from functools import partial
 from typing import Any
 
 import click
 
 from query_things.common import (
-    _get_rec_from_any_collection,
     RecordCache,
     iter_json_objects,
+    make_record_resolver,
     stdargs,
 )
 
@@ -116,8 +115,7 @@ def cli(
     query-things inline-things -p author -p references::items
     """
 
-    get_obj = partial(
-        _get_rec_from_any_collection,
+    resolver = make_record_resolver(
         api_url=api_url,
         collections=collection,
         cache=record_cache,
@@ -127,5 +125,5 @@ def cli(
     paths = [tuple(p.split('::')) for p in path]
 
     for _, rec in iter_json_objects():
-        inline_json_objects(rec, paths, get_obj)
+        inline_json_objects(rec, paths, resolver)
         click.echo(json.dumps(rec), nl=True)

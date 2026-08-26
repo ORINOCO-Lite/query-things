@@ -4,10 +4,10 @@ import sys
 import click
 
 from query_things.common import (
-    _get_rec_from_any_collection,
     RecordCache,
     stdargs,
 )
+from query_things.common.api import _get_rec_from_any_collection
 
 
 def _resolve_records(
