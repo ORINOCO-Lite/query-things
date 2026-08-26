@@ -25,7 +25,7 @@ def _resolve_records(
 
     scalar = not isinstance(prop_in, (list, tuple))
     prop_out = []
-    for prop in ([prop_in] if scalar else prop_in):
+    for prop in [prop_in] if scalar else prop_in:
         pid = prop.get(pid_prop) if isinstance(prop, dict) else prop
         if pid is None:
             continue
@@ -40,9 +40,9 @@ def _resolve_records(
             )
             return resolved if resolved is not None else pid
 
-        inlined = [_proc_pid(pi) for pi in pid] \
-            if isinstance(pid, list) \
-            else _proc_pid(pid)
+        inlined = (
+            [_proc_pid(pi) for pi in pid] if isinstance(pid, list) else _proc_pid(pid)
+        )
 
         if isinstance(prop, dict):
             po = prop.copy()
@@ -55,7 +55,8 @@ def _resolve_records(
 
 @click.command('inline-records')
 @click.option(
-    '-p', '--property',
+    '-p',
+    '--property',
     multiple=True,
     help="""\
 Property to inline records for. Can be given multiple times.
@@ -64,13 +65,14 @@ available under an "object" key. If another field should be
 used, it can be given with a `::<key>` suffix (e.g.,
 `--property delegated_by::roles`). The PID field can be
 multivalued.
-"""
+""",
 )
 @click.option('--api-url', **stdargs['--api-url'])
 @click.option('--token', **stdargs['--token'])
 @click.option('--record-cache', **stdargs['--record-cache'])
 @click.option(
-    '-c', '--collection',
+    '-c',
+    '--collection',
     multiple=True,
     help='Collection to query. Can be given multiple times.',
     default=('public',),
@@ -83,8 +85,7 @@ def cli(
     record_cache: dict,
     collection=('public',),
 ):
-    """DEPRECATED: use `inline-things`
-    """
+    """DEPRECATED: use `inline-things`"""
     for line in sys.stdin:
         rec = json.loads(line)
         for prop in property:
@@ -92,7 +93,9 @@ def cli(
             _resolve_records(
                 parent_prop[0],
                 rec,
-                api_url, token, collection,
+                api_url,
+                token,
+                collection,
                 record_cache,
                 pid_prop=parent_prop[1] if len(parent_prop) > 1 else 'object',
             )

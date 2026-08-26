@@ -30,7 +30,7 @@ def walk(
     if isinstance(container, dict) and key in container:
         value = container[key]
 
-        if isinstance(value, str) and ":" in value:
+        if isinstance(value, str) and ':' in value:
             resolved = get_obj(pid=value)
             if resolved is not None:
                 container[key] = resolved
@@ -69,7 +69,8 @@ def inline_json_objects(
 
 @click.command('inline-things')
 @click.option(
-    '-p', '--path',
+    '-p',
+    '--path',
     multiple=True,
     help="""\
 Path to thing (identifier) to inline. Can be given multiple times.  Paths can
@@ -77,13 +78,14 @@ point to keys inside nested objects, and inlining multiple levels of nested
 intermediate objects is possible. Keys spanning nesting levels must be given
 `::` separated (e.g., `influenced_by::object::name`).  Fields identified by a
 path (including intermediate levels) may be multivalued.
-"""
+""",
 )
 @click.option('--api-url', **stdargs['--api-url'])
 @click.option('--token', **stdargs['--token'])
 @click.option('--record-cache', **stdargs['--record-cache'])
 @click.option(
-    '-c', '--collection',
+    '-c',
+    '--collection',
     multiple=True,
     help='Collection to query. Can be given multiple times.',
     default=('public',),

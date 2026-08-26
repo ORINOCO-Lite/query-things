@@ -1,4 +1,3 @@
-
 import json
 import sys
 
@@ -21,14 +20,17 @@ from query_things import (
     multiple=True,
 )
 @click.option(
-    '--class', '-C', 'class_name',
+    '--class',
+    '-C',
+    'class_name',
     help='Constrain injected objects to this class',
 )
 @click.option('--api-url', **stdargs['--api-url'])
 @click.option('--token', **stdargs['--token'])
 @click.option('--record-cache', **stdargs['--record-cache'])
 @click.option(
-    '-c', '--collection',
+    '-c',
+    '--collection',
     multiple=True,
     help='Collection to query. Can be given multiple times.',
     default=('public',),
@@ -43,20 +45,21 @@ def cli(
     record_cache: dict,
     collection=('public',),
 ):
-    """Inject records that link to each input record
-    """
+    """Inject records that link to each input record"""
     for line in sys.stdin:
         rec = json.loads(line)
         linkers = []
         for col in collection:
-            linkers.extend(get_any_thing_that_links_pid_via_x(
-                link,
-                class_name,
-                api_url,
-                col,
-                rec['pid'],
-                token=token,
-            ))
+            linkers.extend(
+                get_any_thing_that_links_pid_via_x(
+                    link,
+                    class_name,
+                    api_url,
+                    col,
+                    rec['pid'],
+                    token=token,
+                )
+            )
         target = rec.get(inject)
         if target is None:
             rec[inject] = linkers
@@ -97,10 +100,7 @@ def get_any_thing_that_links_pid_via_x(
         if not isinstance(prop, (list, tuple)):
             prop = [prop]
 
-        return any(
-            _pid_match(val, target_pid, via)
-            for val in prop
-        )
+        return any(_pid_match(val, target_pid, via) for val in prop)
 
     return [
         res[0]
@@ -111,8 +111,5 @@ def get_any_thing_that_links_pid_via_x(
             matching=pid,
             token=token,
         )
-        if any(
-            _does_link(res[0], pid, prop_id)
-            for prop_id in link
-        )
+        if any(_does_link(res[0], pid, prop_id) for prop_id in link)
     ]

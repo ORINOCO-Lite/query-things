@@ -9,15 +9,18 @@ from query_things import (
 
 
 @click.command('list')
-@optgroup.group(
-    'Filters', cls=MutuallyExclusiveOptionGroup,
-    help='Subselect records')
+@optgroup.group('Filters', cls=MutuallyExclusiveOptionGroup, help='Subselect records')
 @optgroup.option(
-    '--pid', metavar='IDENTIFER', multiple=True,
+    '--pid',
+    metavar='IDENTIFER',
+    multiple=True,
     help='Identifier of a particular record to list. Errors if not such record is found. Can be given multiple times.',
 )
 @optgroup.option(
-    '--class', 'cls', metavar='IDENTIFIER', multiple=True,
+    '--class',
+    'cls',
+    metavar='IDENTIFIER',
+    multiple=True,
     help='Identifier of a class for which to list all records. Can be given multiple times.',
 )
 @click.option('--record-cache', **stdargs['--record-cache'])

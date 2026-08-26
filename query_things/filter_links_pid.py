@@ -27,7 +27,8 @@ from query_things import (
 @click.option('--token', **stdargs['--token'])
 @click.option('--record-cache', **stdargs['--record-cache'])
 @click.option(
-    '-c', '--collection',
+    '-c',
+    '--collection',
     multiple=True,
     help='Collection to query. Can be given multiple times.',
     default=('public',),
@@ -41,8 +42,8 @@ def cli(
     record_cache: dict,
     collection=('public',),
 ):
-    """Filter records by links to a specific PID
-    """
+    """Filter records by links to a specific PID"""
+
     def _pid_match(val: str | dict, pid: str, recursive: bool, via: str):
         if isinstance(val, dict):
             val = val['object']
@@ -81,10 +82,7 @@ def cli(
         if not isinstance(prop, (list, tuple)):
             prop = [prop]
 
-        return any(
-            _pid_match(val, target_pid, recursive, via)
-            for val in prop
-        )
+        return any(_pid_match(val, target_pid, recursive, via) for val in prop)
 
     for line in sys.stdin:
         rec = json.loads(line)

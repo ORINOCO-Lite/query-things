@@ -48,8 +48,8 @@ stdargs = {
         'envvar': 'QRI_RECORD_CACHE',
         'callback': _handle_record_cache,
         'type': click.Path(
-            file_okay=True, dir_okay=False, writable=True, readable=True,
-            path_type=Path),
+            file_okay=True, dir_okay=False, writable=True, readable=True, path_type=Path
+        ),
         'show_envvar': True,
     },
 }

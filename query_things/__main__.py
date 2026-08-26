@@ -14,8 +14,7 @@ from query_things import (
 
 @click.group()
 def main():
-    """Tools to query, filter, and process Things-compliant metadata
-    """
+    """Tools to query, filter, and process Things-compliant metadata"""
 
 
 for mod in (

@@ -10,7 +10,7 @@ from jinja2 import (
     FileSystemLoader,
 )
 
-default_inlineblock_delims = default=('{', '}')
+default_inlineblock_delims = default = ('{', '}')
 default_statement_marker = '%'
 default_comment_marker = '#'
 
@@ -110,8 +110,8 @@ def cli(
         comment_start_string=f'{jinja_block_delims[0]}{jinja_comment_marker}',
         comment_end_string=f'{jinja_comment_marker}{jinja_block_delims[1]}',
         # TODO this feature seems useful, add support
-        #line_statement_prefix = f'',
-        #line_comment_prefix = f'',
+        # line_statement_prefix = f'',
+        # line_comment_prefix = f'',
     )
 
     # register filter to become available within a template
