@@ -37,6 +37,7 @@ stdargs = {
     '--api-url': {
         'envvar': 'DUMPTHINGS_APIURL',
         'show_envvar': True,
+        'required': True,
     },
     'collection': {},
     '--token': {
