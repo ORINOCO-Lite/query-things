@@ -16,7 +16,7 @@ from query_things.common import (
 @click.argument('inject')
 @click.option(
     '--link',
-    help='Linkage target, linking property and target PID',
+    help='Linking property. Can be given multiple times.',
     metavar='<PROPERTY>',
     multiple=True,
     required=True,
