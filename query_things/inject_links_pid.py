@@ -3,7 +3,7 @@ import sys
 from typing import Any
 
 import click
-from dump_things_pyclient.communicate import (
+from dump_things_pyclient.communicate import (  # type: ignore[import-untyped]
     collection_read_records_of_class,
 )
 
@@ -26,16 +26,16 @@ from query_things import (
     'class_name',
     help='Constrain injected objects to this class',
 )
-@click.option('--api-url', **stdargs['--api-url'])
-@click.option('--token', **stdargs['--token'])
-@click.option('--record-cache', **stdargs['--record-cache'])
+@click.option('--api-url', **stdargs['--api-url'])  # type: ignore[arg-type]
+@click.option('--token', **stdargs['--token'])  # type: ignore[arg-type]
+@click.option('--record-cache', **stdargs['--record-cache'])  # type: ignore[arg-type]
 @click.option(
     '-c',
     '--collection',
     multiple=True,
     help='Collection to query. Can be given multiple times.',
     default=('public',),
-    **stdargs['collection'],
+    **stdargs['collection'],  # type: ignore[arg-type]
 )
 def cli(
     inject: str,
@@ -68,7 +68,7 @@ def _proc_record(
     *,
     inject: str,
     collections: tuple[str],
-    link,
+    link: tuple[str],
     api_url: str,
     class_name: str | None = None,
     token: str | None = None,
@@ -97,8 +97,8 @@ def _proc_record(
 
 
 def get_any_thing_that_links_pid_via_x(
-    link: tuple[tuple[str, str]],
-    class_name: str,
+    link: tuple[str],
+    class_name: str | None,
     api_url: str,
     collection: str,
     pid: str,
