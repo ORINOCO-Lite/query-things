@@ -51,6 +51,7 @@ def _resolve_records(
             po = inlined
         prop_out.append(po)
     rec[property] = prop_out[0] if scalar else prop_out
+    return None
 
 
 @click.command('inline-records')

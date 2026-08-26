@@ -21,7 +21,6 @@ def jinja_env():
 def test_proc_rec_renders_record_to_output_file(
     tmp_path,
     jinja_env,
-    capsys,
 ):
     template = jinja_env.from_string('Name: {{ name }}\nPID: {{ pid }}\n')
 

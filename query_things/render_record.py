@@ -9,6 +9,7 @@ from jinja2 import (
     Environment,
     FileSystemLoader,
 )
+
 from query_things import iter_json_objects
 
 default_inlineblock_delims = default = ('{', '}')

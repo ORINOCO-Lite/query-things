@@ -1,6 +1,6 @@
 import json
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import click
 from dump_things_pyclient.communicate import (
@@ -92,19 +92,16 @@ def iter_json_objects():
         try:
             rec = json.loads(stripped)
         except json.JSONDecodeError as e:
-            raise click.ClickException(
-                f"Invalid JSON on line {lineno}: {e}"
-            ) from e
+            msg = f"Invalid JSON on line {lineno}: {e}"
+            raise click.ClickException(msg) from e
 
         if not isinstance(rec, dict):
-            raise click.ClickException(
-                f"Line {lineno} must be a JSON object"
-            )
+            msg = f"Line {lineno} must be a JSON object"
+            raise click.ClickException(msg)
 
         pid = rec.get('pid')
         if not isinstance(pid, str):
-            raise click.ClickException(
-                f"Line {lineno} must have a string 'pid'"
-            )
+            msg = f"Line {lineno} must have a string 'pid'"
+            raise click.ClickException(msg)
 
         yield line, rec
