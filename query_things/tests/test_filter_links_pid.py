@@ -180,7 +180,7 @@ class TestFilterLinksPidBasic:
         """Test specifying custom collection."""
         input_data = json.dumps(sample_record)
 
-        with patch('query_things.common.api._get_rec_from_any_collection') as mock_get:
+        with patch('query_things.common.api._get_rec_from_any_collection'):
             result = runner.invoke(
                 cli,
                 [
