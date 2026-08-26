@@ -1,12 +1,12 @@
-import json
-import sys
-
 import click
 from dump_things_pyclient.communicate import (
     collection_read_record_with_pid,
 )
 
-from query_things.common import stdargs
+from query_things.common import (
+    iter_json_objects,
+    stdargs,
+)
 
 
 @click.command('filter-linked-pid')
@@ -51,7 +51,6 @@ def cli(
         lnk if isinstance(lnk, dict) else {'object': lnk}
         for lnk in (ref_prop if isinstance(ref_prop, list) else [ref_prop])
     ]
-    for line in sys.stdin:
-        rec = json.loads(line)
+    for line, rec in iter_json_objects():
         if any(lnk['object'] == rec['pid'] for lnk in linked):
             click.echo(line, nl=False)

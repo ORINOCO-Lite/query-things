@@ -1,10 +1,8 @@
-import json
-import sys
-
 import click
 
 from query_things.common import (
     _get_rec_from_any_collection,
+    iter_json_objects,
     stdargs,
 )
 
@@ -84,8 +82,7 @@ def cli(
 
         return any(_pid_match(val, target_pid, recursive, via) for val in prop)
 
-    for line in sys.stdin:
-        rec = json.loads(line)
+    for line, rec in iter_json_objects():
         report = True
         for prop_id, pid in link:
             if not _does_link(rec, pid, prop_id, recursive):
