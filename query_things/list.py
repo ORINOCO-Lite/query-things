@@ -35,12 +35,23 @@ def cli(
     The report can be constrained by record PIDs or class(es).
     """
     if pid:
+        results = []
+        missing = []
+
         for p in pid:
-            try:
-                click.echo(json.dumps(record_cache[p]), nl=True)
-            except KeyError as e:
-                msg = f'No record with PID {p!r} in the cache'
-                raise ValueError(msg) from e
+            rec = record_cache.get(p)
+            if rec is None:
+                missing.append(p)
+            else:
+                results.append(rec)
+
+        if missing:
+            raise click.ClickException(
+                'No record(s) in cache: ' + ', '.join(repr(p) for p in missing)
+            )
+
+        for rec in results:
+            click.echo(json.dumps(rec), nl=True)
         return
 
     # for all other scenarios we need to loop over all records

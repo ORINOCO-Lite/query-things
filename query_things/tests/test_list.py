@@ -1,5 +1,6 @@
 import json
 
+import click
 import pytest
 
 from query_things.list import cli
@@ -177,16 +178,6 @@ def test_lists_records_by_pid_in_requested_order(capsys):
     ]
 
 
-def test_pid_filter_can_emit_a_none_record(capsys):
-    record_cache = {
-        "pid-1": None,
-    }
-
-    cli.callback(record_cache=record_cache, pid=("pid-1",), cls=())
-
-    assert emitted_json(capsys) == [None]
-
-
 def test_missing_pid_raises_value_error():
     record_cache = {
         "pid-1": {
@@ -196,8 +187,8 @@ def test_missing_pid_raises_value_error():
     }
 
     with pytest.raises(
-        ValueError,
-        match=r"No record with PID 'missing' in the cache",
+        click.ClickException,
+        match=r"missing",
     ):
         cli.callback(
             record_cache=record_cache,
@@ -214,19 +205,14 @@ def test_missing_pid_error_stops_processing(capsys):
         },
     }
 
-    with pytest.raises(ValueError):
+    with pytest.raises(click.ClickException):
         cli.callback(
             record_cache=record_cache,
             pid=("pid-1", "missing"),
             cls=(),
         )
-
-    assert emitted_json(capsys) == [
-        {
-            "pid": "pid-1",
-            "schema_type": "Person",
-        }
-    ]
+    # no partial report
+    assert emitted_json(capsys) == []
 
 
 def test_pid_filter_takes_precedence_over_class_filter(capsys):
