@@ -134,13 +134,13 @@ def _proc_rec(
     output_filename_template: tuple[str, ...],
 ):
     homogenize_annotations(rec)
-    props = {
+    props = dict(rec)
+    props.update({
         '__datetime': datetime,
         '__datetime_now': datetime.now(),  # noqa: DTZ005
         '__pid_curie_reference': rec['pid'].split(':', maxsplit=1)[1],
         '__rec': rec,
-    }
-    props.update(rec)
+    })
     output_filepath = None
     for ofnt in output_filename_template:
         try:
