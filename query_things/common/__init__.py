@@ -5,13 +5,21 @@ import click
 from .api import _get_rec_from_any_collection  # noqa: TID252
 from .cache import _handle_record_cache  # noqa: TID252
 from .io import iter_json_objects  # noqa: TID252
+from .linking import (
+    all_records_have_links,
+    iter_link_pids,
+    record_has_link,
+)
 from .records import homogenize_annotations  # noqa: TID252
 
 __all__ = [
     '_get_rec_from_any_collection',
     '_handle_record_cache',
+    'all_records_have_links',
     'iter_json_objects',
+    'iter_link_pids',
     'homogenize_annotations',
+    'record_has_link',
     'stdargs',
 ]
 

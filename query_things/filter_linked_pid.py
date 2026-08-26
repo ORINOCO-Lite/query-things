@@ -5,6 +5,7 @@ from dump_things_pyclient.communicate import (
 
 from query_things.common import (
     iter_json_objects,
+    iter_link_pids,
     stdargs,
 )
 
@@ -43,14 +44,7 @@ def cli(
         pid=pid,
         token=token,
     )
-    ref_prop = ref[property]
-    # normalize to a structure that matches association classes.
-    # this will make it easier to extend the matching (ie. with
-    # time windows) later on
-    linked = [
-        lnk if isinstance(lnk, dict) else {'object': lnk}
-        for lnk in (ref_prop if isinstance(ref_prop, list) else [ref_prop])
-    ]
+    linked_pids = set(iter_link_pids(ref.get(property)))
     for line, rec in iter_json_objects():
-        if any(lnk['object'] == rec['pid'] for lnk in linked):
+        if rec['pid'] in linked_pids:
             click.echo(line, nl=False)
