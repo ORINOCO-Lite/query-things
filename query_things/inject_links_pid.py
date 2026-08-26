@@ -20,6 +20,7 @@ from query_things import (
     help='Linkage target, linking property and target PID',
     metavar='<PROPERTY>',
     multiple=True,
+    required=True,
 )
 @click.option(
     '--class',
