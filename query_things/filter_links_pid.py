@@ -19,7 +19,6 @@ from query_things.common import (
 @click.option(
     '--recursive',
     help='Also consider indirect linkage via recursion',
-    type=bool,
     is_flag=True,
 )
 @click.option('--api-url', **stdargs['--api-url'])
