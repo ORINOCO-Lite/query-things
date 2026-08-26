@@ -4,7 +4,7 @@ from unittest.mock import Mock
 
 import pytest
 
-import query_things.filter_linked_pid as filter_linked_pid
+from query_things import filter_linked_pid
 
 
 def run_filter(

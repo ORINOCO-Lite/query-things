@@ -2,6 +2,7 @@ from collections.abc import (
     Callable,
     Sequence,
 )
+
 from dump_things_pyclient.communicate import (
     collection_read_record_with_pid,
 )

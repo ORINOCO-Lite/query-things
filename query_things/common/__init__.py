@@ -6,8 +6,8 @@ from .api import (
     make_record_resolver,
 )
 from .cache import (  # noqa: TID252
-    _handle_record_cache,
     RecordCache,
+    _handle_record_cache,
 )
 from .io import iter_json_objects  # noqa: TID252
 from .linking import (
@@ -20,9 +20,9 @@ from .records import homogenize_annotations  # noqa: TID252
 __all__ = [
     'RecordCache',
     'all_records_have_links',
+    'homogenize_annotations',
     'iter_json_objects',
     'iter_link_pids',
-    'homogenize_annotations',
     'make_record_resolver',
     'record_has_link',
     'stdargs',

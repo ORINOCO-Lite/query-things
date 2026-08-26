@@ -1,7 +1,8 @@
 import json
+from unittest.mock import patch
+
 import pytest
 from click.testing import CliRunner
-from unittest.mock import patch
 
 from query_things.filter_links_pid import cli
 
@@ -179,9 +180,7 @@ class TestFilterLinksPidBasic:
         """Test specifying custom collection."""
         input_data = json.dumps(sample_record)
 
-        with patch(
-            'query_things.common.api._get_rec_from_any_collection'
-        ) as mock_get:
+        with patch('query_things.common.api._get_rec_from_any_collection') as mock_get:
             result = runner.invoke(
                 cli,
                 [
