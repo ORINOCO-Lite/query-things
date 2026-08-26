@@ -55,7 +55,7 @@ def test_inline_json_objects_mutates_multiple_paths():
 def test_walk_ignores_unresolved_reference():
     obj = {'a': {'b': 'thing:1'}}
 
-    def get_obj(pid):
+    def get_obj(pid):  # noqa: ARG001
         return None
 
     walk(obj, ('a', 'b'), get_obj)

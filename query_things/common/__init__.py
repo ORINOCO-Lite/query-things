@@ -1,10 +1,17 @@
-import click
 from pathlib import Path
 
-from .api import _get_rec_from_any_collection
-from .cache import _handle_record_cache
-from .io import iter_json_objects
+import click
 
+from .api import _get_rec_from_any_collection  # noqa: TID252
+from .cache import _handle_record_cache  # noqa: TID252
+from .io import iter_json_objects  # noqa: TID252
+
+__all__ = [
+    '_get_rec_from_any_collection',
+    '_handle_record_cache',
+    'iter_json_objects',
+    'stdargs',
+]
 
 # this collection cannot contain the help strings.
 # they are hard to write generic and still be fitting.

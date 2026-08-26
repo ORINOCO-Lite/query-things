@@ -37,7 +37,7 @@ from query_things.common import (
 )
 def cli(
     link: tuple[tuple[str, str], ...],
-    recursive: bool,
+    recursive: bool,  # noqa: FBT001
     api_url: str,
     token: str | None,
     record_cache: dict,
@@ -45,7 +45,7 @@ def cli(
 ):
     """Filter records by links to a specific PID"""
 
-    def _pid_match(val: str | dict, pid: str, recursive: bool, via: str):
+    def _pid_match(val: str | dict, pid: str, recursive: bool, via: str):  # noqa: FBT001
         if isinstance(val, dict):
             val = val['object']
 
@@ -73,7 +73,7 @@ def cli(
         rec: dict,
         target_pid: str,
         via: str,
-        recursive: bool,
+        recursive: bool,  # noqa: FBT001
     ) -> bool:
         if via not in rec:
             # no chance

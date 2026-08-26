@@ -20,7 +20,7 @@ from query_things import stdargs
 def cli(
     collection: str,
     pid: str,
-    property: str,
+    property: str,  # noqa: A002
     api_url: str,
     token: str | None = None,
 ):

@@ -10,7 +10,7 @@ from query_things.common import (
 
 
 def _resolve_records(
-    property: str,
+    property: str,  # noqa: A002
     rec: dict,
     api_url: str,
     token: str,
@@ -80,7 +80,7 @@ multivalued.
     **stdargs['collection'],
 )
 def cli(
-    property: tuple[str],
+    property: tuple[str],  # noqa: A002
     api_url: str,
     token: str,
     record_cache: dict,

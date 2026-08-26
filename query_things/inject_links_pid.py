@@ -44,7 +44,7 @@ def cli(
     class_name: str | None,
     api_url: str,
     token: str | None,
-    record_cache: dict,
+    record_cache: dict,  # noqa: ARG001
     collection: tuple[str, ...] = ('public',),
 ):
     """Inject records that link to each input record"""
@@ -104,7 +104,7 @@ def get_any_thing_that_links_pid_via_x(
     pid: str,
     token: str | None = None,
 ):
-    def _pid_match(val: str | dict, pid: str, via: str):
+    def _pid_match(val: str | dict, pid: str, via: str):  # noqa: ARG001
         if isinstance(val, dict):
             val = val['object']
         return pid == val
