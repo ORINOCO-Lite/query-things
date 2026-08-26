@@ -2,12 +2,14 @@ from dump_things_pyclient.communicate import (
     collection_read_record_with_pid,
 )
 
+from query_things.common.cache import RecordCache
+
 
 def _get_rec_from_any_collection(
     api_url: str,
     collections: tuple[str, ...],
     pid: str,
-    cache: dict,
+    cache: RecordCache,
     token: str | None = None,
 ):
     for col in collections:

@@ -5,6 +5,7 @@ import click
 
 from query_things.common import (
     _get_rec_from_any_collection,
+    RecordCache,
     stdargs,
 )
 
@@ -15,7 +16,7 @@ def _resolve_records(
     api_url: str,
     token: str | None,
     collections: tuple[str, ...],
-    cache: dict,
+    cache: RecordCache,
     pid_prop: str = 'object',
 ) -> None:
     prop_in = rec.get(property)
@@ -83,7 +84,7 @@ def cli(
     property: tuple[str, ...],  # noqa: A002
     api_url: str,
     token: str | None,
-    record_cache: dict,
+    record_cache: RecordCache,
     collection=('public',),
 ):
     """DEPRECATED: use `inline-things`"""

@@ -2,6 +2,7 @@ import click
 
 from query_things.common import (
     _get_rec_from_any_collection,
+    RecordCache,
     iter_json_objects,
     stdargs,
 )
@@ -36,7 +37,7 @@ def cli(
     recursive: bool,  # noqa: FBT001
     api_url: str,
     token: str | None,
-    record_cache: dict,
+    record_cache: RecordCache,
     collection: tuple[str, ...] = ('public',),
 ):
     """Filter records by links to a specific PID"""

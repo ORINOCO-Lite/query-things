@@ -7,6 +7,7 @@ from dump_things_pyclient.communicate import (  # type: ignore[import-untyped]
 )
 
 from query_things.common import (
+    RecordCache,
     iter_json_objects,
     record_has_link,
     stdargs,
@@ -45,7 +46,7 @@ def cli(
     class_name: str | None,
     api_url: str,
     token: str | None,
-    record_cache: dict,  # noqa: ARG001
+    record_cache: RecordCache,  # noqa: ARG001
     collection: tuple[str, ...] = ('public',),
 ):
     """Inject records that link to each input record"""

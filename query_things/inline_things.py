@@ -7,6 +7,7 @@ import click
 
 from query_things.common import (
     _get_rec_from_any_collection,
+    RecordCache,
     iter_json_objects,
     stdargs,
 )
@@ -96,7 +97,7 @@ def cli(
     path: tuple[str, ...],
     api_url: str,
     token: str | None,
-    record_cache: dict,
+    record_cache: RecordCache,
     collection=('public',),
 ):
     """Inline nested Things PID references

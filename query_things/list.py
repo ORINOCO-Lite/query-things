@@ -4,6 +4,7 @@ import click
 from click_option_group import MutuallyExclusiveOptionGroup, optgroup
 
 from query_things.common import (
+    RecordCache,
     stdargs,
 )
 
@@ -25,7 +26,7 @@ from query_things.common import (
 )
 @click.option('--record-cache', **stdargs['--record-cache'])  # type: ignore[arg-type]
 def cli(
-    record_cache: dict,
+    record_cache: RecordCache,
     pid: tuple[str, ...] | None = None,
     cls: tuple[str, ...] | None = None,
 ):

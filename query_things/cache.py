@@ -5,6 +5,7 @@ from contextlib import suppress
 import click
 
 from query_things.common import (
+    RecordCache,
     stdargs,
 )
 
@@ -12,7 +13,7 @@ from query_things.common import (
 @click.command('cache')
 @click.option('--record-cache', **stdargs['--record-cache'])
 def cli(
-    record_cache: dict,
+    record_cache: RecordCache,
 ):
     """Cache JSON records and pass them through
 
