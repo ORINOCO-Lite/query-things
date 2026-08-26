@@ -70,7 +70,7 @@ def cli(
     provided Jinja2 template.
 
     The values corresponding to all top-level keys of a record are made
-    available as direct variables for template rendering unsing the
+    available as direct variables for template rendering using the
     respective as a variable name. In addition, the following variables
     are also provided:
 
