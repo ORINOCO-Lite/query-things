@@ -12,7 +12,7 @@ from query_things.common import (
 @optgroup.group('Filters', cls=MutuallyExclusiveOptionGroup, help='Subselect records')
 @optgroup.option(
     '--pid',
-    metavar='IDENTIFER',
+    metavar='IDENTIFIER',
     multiple=True,
     help='Identifier of a particular record to list. Errors if not such record is found. Can be given multiple times.',
 )
