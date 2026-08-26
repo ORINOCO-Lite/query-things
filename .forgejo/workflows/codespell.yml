@@ -1,0 +1,12 @@
+---
+name: Codespell
+on: [push, pull_request]
+jobs:
+  codespell:
+    name: Check for spelling errors
+    runs-on: debian-latest
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+      - name: Codespell
+        uses: https://github.com/codespell-project/actions-codespell@v2.2
