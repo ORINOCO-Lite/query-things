@@ -2,6 +2,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 import click
 import yaml
@@ -15,10 +16,10 @@ default_statement_marker = '%'
 default_comment_marker = '#'
 
 
-def toyaml(input):
+def toyaml(obj):
     """Custom filter to convert an object to a YAML string"""
     return yaml.safe_dump(
-        input,
+        obj,
         sort_keys=False,
         default_flow_style=False,
     )
@@ -109,7 +110,7 @@ def cli(
         variable_end_string=f'{jinja_block_delims[1]}{jinja_block_delims[1]}',
         comment_start_string=f'{jinja_block_delims[0]}{jinja_comment_marker}',
         comment_end_string=f'{jinja_comment_marker}{jinja_block_delims[1]}',
-        # TODO this feature seems useful, add support
+        # TODO: this feature seems useful, add support
         # line_statement_prefix = f'',
         # line_comment_prefix = f'',
     )
@@ -117,28 +118,40 @@ def cli(
     # register filter to become available within a template
     jinja_env.filters['toyaml'] = toyaml
 
-    template = jinja_env.get_template(template.name)
+    tmpl = jinja_env.get_template(template.name)
     for line in sys.stdin:
         rec = json.loads(line)
-        homogenize_annotations(rec)
-        props = {
-            '__datetime': datetime,
-            '__datetime_now': datetime.now(),
-            '__pid_curie_reference': rec['pid'].split(':', maxsplit=1)[1],
-            '__rec': rec,
-        }
-        props.update(rec)
-        output_filepath = None
-        for ofnt in output_filename_template:
-            try:
-                output_filepath = Path(ofnt.format(**props))
-                break
-            except Exception:
-                pass
-        if output_filepath is None:
-            msg = 'All given output filename templates errored on record'
-            raise ValueError(msg)
-        print(output_filepath)
-        output_filepath.parent.mkdir(parents=True, exist_ok=True)
-        rendered_rec = template.render(**props)
-        output_filepath.write_text(rendered_rec)
+        _proc_rec(
+            rec,
+            tmpl,
+            output_filename_template=output_filename_template,
+        )
+
+
+def _proc_rec(
+    rec: dict[str, Any],
+    template,
+    *,
+    output_filename_template: str,
+):
+    homogenize_annotations(rec)
+    props = {
+        '__datetime': datetime,
+        '__datetime_now': datetime.now(),  # noqa: DTZ005
+        '__pid_curie_reference': rec['pid'].split(':', maxsplit=1)[1],
+        '__rec': rec,
+    }
+    props.update(rec)
+    output_filepath = None
+    for ofnt in output_filename_template:
+        try:
+            output_filepath = Path(ofnt.format(**props))
+            break
+        except Exception as e:  # noqa: BLE001
+            print(e, file=sys.stderr)  # noqa: T201
+    if output_filepath is None:
+        msg = 'All given output filename templates errored on record'
+        raise ValueError(msg)
+    output_filepath.parent.mkdir(parents=True, exist_ok=True)
+    rendered_rec = template.render(**props)
+    output_filepath.write_text(rendered_rec)
