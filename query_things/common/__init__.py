@@ -18,7 +18,6 @@ from .linking import (
 from .records import homogenize_annotations  # noqa: TID252
 
 __all__ = [
-    '_handle_record_cache',
     'RecordCache',
     'all_records_have_links',
     'iter_json_objects',
