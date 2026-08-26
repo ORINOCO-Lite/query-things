@@ -12,7 +12,7 @@ from query_things import (
 def cli(
     record_cache: dict,
 ):
-    """Cache records
+    """Cache JSON records and pass them through
 
     When a record cache is configured, this command stores any records
     read from STDIN in it. Input that fails to JSON-load, or does not

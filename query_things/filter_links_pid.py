@@ -40,7 +40,7 @@ def cli(
     record_cache: dict,
     collection=('public',),
 ):
-    """Filter records that link a specific object via a given property
+    """Filter records by links to a specific PID
     """
     def _pid_match(val: str | dict, pid: str, recursive: bool, via: str):
         if isinstance(val, dict):

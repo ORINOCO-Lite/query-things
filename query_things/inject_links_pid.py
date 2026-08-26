@@ -44,7 +44,7 @@ def cli(
     record_cache: dict,
     collection=('public',),
 ):
-    """Inject records that link an object via a given property
+    """Inject records that link to each input record
     """
     for line in sys.stdin:
         rec = json.loads(line)

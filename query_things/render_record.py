@@ -63,7 +63,7 @@ def cli(
     jinja_statement_marker: str = default_statement_marker,
     jinja_comment_marker: str = default_comment_marker,
 ):
-    """Render a template with a metadata record as input
+    """Render records with a Jinja template
 
     This is a generic helper with no understanding of the nature of the
     provided Jinja2 template.

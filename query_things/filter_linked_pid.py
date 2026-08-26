@@ -24,7 +24,7 @@ def cli(
     api_url: str,
     token: str | None = None,
 ):
-    """Match specific property->record links
+    """Keep records linked from a reference
 
     Incoming records are tested whether their `pid` appears
     in the property of another record. Properties with

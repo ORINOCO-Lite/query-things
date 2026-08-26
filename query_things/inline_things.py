@@ -97,7 +97,7 @@ def cli(
     record_cache: dict,
     collection=('public',),
 ):
-    """Resolves PIDs at given paths, and inlines the objects
+    """Inline nested Things PID references
 
     Read JSON records from stdin, resolve PID references at the given
     field paths, and write the updated records to stdout.

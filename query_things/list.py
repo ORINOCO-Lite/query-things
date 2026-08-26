@@ -25,7 +25,7 @@ def cli(
     pid: str | None = None,
     cls: str | None = None,
 ):
-    """List records (from the cache)
+    """List records stored in the cache
 
     By default reports all records in the cache in JSON-lines format.
     The report can be constrained by record PIDs or class(es).
