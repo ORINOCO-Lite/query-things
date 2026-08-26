@@ -1,5 +1,6 @@
 import json
 import sys
+from typing import Any
 
 import click
 from dump_things_pyclient.communicate import (
@@ -48,30 +49,51 @@ def cli(
     """Inject records that link to each input record"""
     for line in sys.stdin:
         rec = json.loads(line)
-        linkers = []
-        for col in collection:
-            linkers.extend(
-                get_any_thing_that_links_pid_via_x(
-                    link,
-                    class_name,
-                    api_url,
-                    col,
-                    rec['pid'],
-                    token=token,
-                )
-            )
-        target = rec.get(inject)
-        if target is None:
-            rec[inject] = linkers
-        elif isinstance(target, list):
-            target.extend(linkers)
-            rec[inject] = target
-        else:
-            linkers.insert(0, target)
-            rec[inject] = linkers
+        _proc_record(
+            rec,
+            inject=inject,
+            collections=collection,
+            link=link,
+            class_name=class_name,
+            api_url=api_url,
+            token=token,
+        )
         click.echo(
             json.dumps(rec, ensure_ascii=True, separators=(',', ':')),
         )
+
+
+def _proc_record(
+    rec: dict[str, Any],
+    *,
+    inject: str,
+    collections: tuple[str],
+    link,
+    api_url: str,
+    class_name: str | None = None,
+    token: str | None = None,
+) -> None:
+    linkers = []
+    for col in collections:
+        linkers.extend(
+            get_any_thing_that_links_pid_via_x(
+                link,
+                class_name,
+                api_url,
+                col,
+                rec['pid'],
+                token=token,
+            )
+        )
+    target = rec.get(inject)
+    if target is None:
+        rec[inject] = linkers
+    elif isinstance(target, list):
+        target.extend(linkers)
+        rec[inject] = target
+    else:
+        linkers.insert(0, target)
+        rec[inject] = linkers
 
 
 def get_any_thing_that_links_pid_via_x(
