@@ -35,12 +35,12 @@ from query_things import (
     **stdargs['collection'],
 )
 def cli(
-    link: tuple[tuple[str, str]],
+    link: tuple[tuple[str, str], ...],
     recursive: bool,
     api_url: str,
-    token: str,
+    token: str | None,
     record_cache: dict,
-    collection=('public',),
+    collection: tuple[str, ...] = ('public',),
 ):
     """Filter records by links to a specific PID"""
 

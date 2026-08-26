@@ -8,7 +8,7 @@ from dump_things_pyclient.communicate import (
 )
 
 
-def _handle_record_cache(ctx, _, value) -> {}:
+def _handle_record_cache(ctx, _, value) -> dict:
     if value is None:
         # we return a cache, but it will be in-memory only
         return {}

@@ -40,12 +40,12 @@ from query_things import (
 )
 def cli(
     inject: str,
-    link: tuple[str],
-    class_name: str,
+    link: tuple[str, ...],
+    class_name: str | None,
     api_url: str,
-    token: str,
+    token: str | None,
     record_cache: dict,
-    collection=('public',),
+    collection: tuple[str, ...] = ('public',),
 ):
     """Inject records that link to each input record"""
     for _, rec in iter_json_objects():

@@ -60,7 +60,7 @@ def homogenize_annotations(rec):
 @click.option('--jinja-comment-marker', default=default_comment_marker)
 def cli(
     template: Path,
-    output_filename_template: str,
+    output_filename_template: tuple[str, ...],
     jinja_block_delims: tuple[str, str] = default_inlineblock_delims,
     jinja_statement_marker: str = default_statement_marker,
     jinja_comment_marker: str = default_comment_marker,
@@ -131,7 +131,7 @@ def _proc_rec(
     rec: dict[str, Any],
     template,
     *,
-    output_filename_template: str,
+    output_filename_template: tuple[str, ...],
 ):
     homogenize_annotations(rec)
     props = {

@@ -26,8 +26,8 @@ from query_things import (
 @click.option('--record-cache', **stdargs['--record-cache'])  # type: ignore[arg-type]
 def cli(
     record_cache: dict,
-    pid: tuple[str] | None = None,
-    cls: tuple[str] | None = None,
+    pid: tuple[str, ...] | None = None,
+    cls: tuple[str, ...] | None = None,
 ):
     """List records stored in the cache
 
