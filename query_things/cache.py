@@ -11,7 +11,7 @@ from query_things.common import (
 
 
 @click.command('cache')
-@click.option('--record-cache', **stdargs['--record-cache'])
+@click.option('--record-cache', **stdargs['--record-cache'])  # type: ignore[arg-type]
 def cli(
     record_cache: RecordCache,
 ):

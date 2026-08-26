@@ -1,5 +1,5 @@
 import click
-from dump_things_pyclient.communicate import (
+from dump_things_pyclient.communicate import (  # type: ignore[import-untyped]
     collection_read_record_with_pid,
 )
 
@@ -13,11 +13,11 @@ from query_things.common import (
 @click.command('filter-linked-pid')
 # TODO: maybe later to invert the filter
 # @click.option('--ex
-@click.argument('collection', **stdargs['collection'])
+@click.argument('collection', **stdargs['collection'])  # type: ignore[arg-type]
 @click.argument('pid')
 @click.argument('property')
-@click.option('--api-url', **stdargs['--api-url'])
-@click.option('--token', **stdargs['--token'])
+@click.option('--api-url', **stdargs['--api-url'])  # type: ignore[arg-type]
+@click.option('--token', **stdargs['--token'])  # type: ignore[arg-type]
 def cli(
     collection: str,
     pid: str,

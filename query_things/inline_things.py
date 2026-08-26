@@ -80,9 +80,9 @@ intermediate objects is possible. Keys spanning nesting levels must be given
 path (including intermediate levels) may be multivalued.
 """,
 )
-@click.option('--api-url', **stdargs['--api-url'])
-@click.option('--token', **stdargs['--token'])
-@click.option('--record-cache', **stdargs['--record-cache'])
+@click.option('--api-url', **stdargs['--api-url'])  # type: ignore[arg-type]
+@click.option('--token', **stdargs['--token'])  # type: ignore[arg-type]
+@click.option('--record-cache', **stdargs['--record-cache'])  # type: ignore[arg-type]
 @click.option(
     '-c',
     '--collection',
@@ -90,7 +90,7 @@ path (including intermediate levels) may be multivalued.
     help='Collection to query. Can be given multiple times.',
     default=('public',),
     show_default=True,
-    **stdargs['collection'],
+    **stdargs['collection'],  # type: ignore[arg-type]
 )
 def cli(
     path: tuple[str, ...],

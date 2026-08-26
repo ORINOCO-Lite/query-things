@@ -3,7 +3,7 @@ from collections.abc import (
     Sequence,
 )
 
-from dump_things_pyclient.communicate import (
+from dump_things_pyclient.communicate import (  # type: ignore[import-untyped]
     collection_read_record_with_pid,
 )
 
@@ -30,7 +30,7 @@ def make_record_resolver(
 
 def _get_rec_from_any_collection(
     api_url: str,
-    collections: tuple[str, ...],
+    collections: Sequence[str],
     pid: str,
     cache: RecordCache,
     token: str | None = None,

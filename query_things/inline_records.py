@@ -18,7 +18,7 @@ def _resolve_records(
     collections: tuple[str, ...],
     cache: RecordCache,
     pid_prop: str = 'object',
-) -> None:
+) -> dict | None:
     prop_in = rec.get(property)
     if prop_in is None:
         # nothing to do, doesn't exist
@@ -49,7 +49,7 @@ def _resolve_records(
             po = prop.copy()
             po[pid_prop] = inlined
         else:
-            po = inlined
+            po = inlined  # type: ignore
         prop_out.append(po)
     rec[property] = prop_out[0] if scalar else prop_out
     return None
@@ -69,16 +69,16 @@ used, it can be given with a `::<key>` suffix (e.g.,
 multivalued.
 """,
 )
-@click.option('--api-url', **stdargs['--api-url'])
-@click.option('--token', **stdargs['--token'])
-@click.option('--record-cache', **stdargs['--record-cache'])
+@click.option('--api-url', **stdargs['--api-url'])  # type: ignore[arg-type]
+@click.option('--token', **stdargs['--token'])  # type: ignore[arg-type]
+@click.option('--record-cache', **stdargs['--record-cache'])  # type: ignore[arg-type]
 @click.option(
     '-c',
     '--collection',
     multiple=True,
     help='Collection to query. Can be given multiple times.',
     default=('public',),
-    **stdargs['collection'],
+    **stdargs['collection'],  # type: ignore[arg-type]
 )
 def cli(
     property: tuple[str, ...],  # noqa: A002

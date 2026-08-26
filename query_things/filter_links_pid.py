@@ -23,15 +23,15 @@ from query_things.common import (
     help='Also consider indirect linkage via recursion',
     is_flag=True,
 )
-@click.option('--api-url', **stdargs['--api-url'])
-@click.option('--token', **stdargs['--token'])
-@click.option('--record-cache', **stdargs['--record-cache'])
+@click.option('--api-url', **stdargs['--api-url'])  # type: ignore[arg-type]
+@click.option('--token', **stdargs['--token'])  # type: ignore[arg-type]
+@click.option('--record-cache', **stdargs['--record-cache'])  # type: ignore[arg-type]
 @click.option(
     '-c',
     '--collection',
     multiple=True,
     help='Collection to query. Can be given multiple times.',
-    **stdargs['collection'],
+    **stdargs['collection'],  # type: ignore[arg-type]
 )
 def cli(
     link: tuple[tuple[str, str], ...],
