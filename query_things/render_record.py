@@ -8,6 +8,7 @@ import yaml
 from jinja2 import (
     Environment,
     FileSystemLoader,
+    select_autoescape,
 )
 
 from query_things.common import iter_json_objects
@@ -119,6 +120,7 @@ def cli(
         # TODO: this feature seems useful, add support
         # line_statement_prefix = f'',
         # line_comment_prefix = f'',
+        autoescape=select_autoescape(['html', 'htm', 'xml']),
     )
 
     # register filter to become available within a template
