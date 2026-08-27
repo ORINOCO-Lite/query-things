@@ -1,241 +1,82 @@
-import json
-
 import click
 import pytest
 
+from query_things.common.cache import RecordCache
 from query_things.list import cli
+from query_things.tests import (
+    make_record,
+    output_records,
+)
+
+person = make_record('pid-1', schema_type='Person', name='Alice')
+company = make_record('pid-2', schema_type='Company', name='Example Inc.')
+animal = make_record('pid-3', schema_type='Animal')
+no_type = make_record('pid-4', name='No schema type')
+
+cache = {
+    'pid-1': person,
+    'pid-2': company,
+    'pid-3': animal,
+    'pid-4': no_type,
+    'null': None,
+}
 
 
-def emitted_json(capsys):
-    """Return JSON objects emitted by the command, in order."""
-    output = capsys.readouterr().out
-    return [json.loads(line) for line in output.splitlines()]
-
-
-def test_lists_all_non_null_records(capsys):
-    record_cache = {
-        'pid-1': {
-            'pid': 'pid-1',
-            'schema_type': 'Person',
-            'name': 'Alice',
-        },
-        'pid-2': None,
-        'pid-3': {
-            'pid': 'pid-3',
-            'schema_type': 'Company',
-            'name': 'Example Inc.',
-        },
-    }
-
-    cli.callback(record_cache=record_cache, pid=(), cls=())
-
-    assert emitted_json(capsys) == [
-        {
-            'pid': 'pid-1',
-            'schema_type': 'Person',
-            'name': 'Alice',
-        },
-        {
-            'pid': 'pid-3',
-            'schema_type': 'Company',
-            'name': 'Example Inc.',
-        },
-    ]
-
-
-def test_empty_cache_emits_nothing(capsys):
-    cli.callback(record_cache={}, pid=(), cls=())
-
-    assert capsys.readouterr().out == ''
-
-
-def test_skips_none_records_when_filtering_by_class(capsys):
-    record_cache = {
-        'pid-1': None,
-        'pid-2': {
-            'pid': 'pid-2',
-            'schema_type': 'Person',
-        },
-    }
-
-    cli.callback(record_cache=record_cache, pid=(), cls=('Person',))
-
-    assert emitted_json(capsys) == [
-        {
-            'pid': 'pid-2',
-            'schema_type': 'Person',
-        }
-    ]
-
-
-def test_filters_records_by_single_class(capsys):
-    record_cache = {
-        'pid-1': {
-            'pid': 'pid-1',
-            'schema_type': 'Person',
-        },
-        'pid-2': {
-            'pid': 'pid-2',
-            'schema_type': 'Company',
-        },
-    }
-
-    cli.callback(record_cache=record_cache, pid=(), cls=('Person',))
-
-    assert emitted_json(capsys) == [
-        {
-            'pid': 'pid-1',
-            'schema_type': 'Person',
-        }
-    ]
-
-
-def test_filters_records_by_multiple_classes(capsys):
-    record_cache = {
-        'pid-1': {
-            'pid': 'pid-1',
-            'schema_type': 'Person',
-        },
-        'pid-2': {
-            'pid': 'pid-2',
-            'schema_type': 'Company',
-        },
-        'pid-3': {
-            'pid': 'pid-3',
-            'schema_type': 'Animal',
-        },
-    }
-
-    cli.callback(
-        record_cache=record_cache,
-        pid=(),
-        cls=('Person', 'Company'),
-    )
-
-    assert emitted_json(capsys) == [
-        {
-            'pid': 'pid-1',
-            'schema_type': 'Person',
-        },
-        {
-            'pid': 'pid-2',
-            'schema_type': 'Company',
-        },
-    ]
-
-
-def test_records_without_schema_type_are_excluded_when_class_filter_is_used(
-    capsys,
+@pytest.mark.parametrize(
+    ('cache_data', 'pid', 'cls', 'expected'),
+    [
+        ({}, (), (), []),
+        (cache, (), (), [person, company, animal, no_type]),
+        (cache, (), ('Person',), [person]),
+        (cache, (), ('Person', 'Company'), [person, company]),
+        (cache, (), ('Animal',), [animal]),
+        (cache, ('pid-2', 'pid-1'), (), [company, person]),
+        (cache, ('pid-2',), ('Person',), [company]),
+        ({'pid-1': person, 'null': None}, ('pid-1',), (), [person]),
+    ],
+)
+def test_list_outputs_filtered_records(
+    run_callback,
+    cache_data,
+    pid,
+    cls,
+    expected,
 ):
-    record_cache = {
-        'pid-1': {
-            'pid': 'pid-1',
-            'name': 'No schema type',
-        },
-        'pid-2': {
-            'pid': 'pid-2',
-            'schema_type': 'Person',
-        },
-    }
+    record_cache = RecordCache(data=cache_data)
 
-    cli.callback(record_cache=record_cache, pid=(), cls=('Person',))
-
-    assert emitted_json(capsys) == [
-        {
-            'pid': 'pid-2',
-            'schema_type': 'Person',
-        }
-    ]
-
-
-def test_lists_records_by_pid_in_requested_order(capsys):
-    record_cache = {
-        'pid-1': {
-            'pid': 'pid-1',
-            'schema_type': 'Person',
-        },
-        'pid-2': {
-            'pid': 'pid-2',
-            'schema_type': 'Company',
-        },
-    }
-
-    cli.callback(
+    result = run_callback(
+        cli.callback,
         record_cache=record_cache,
-        pid=('pid-2', 'pid-1'),
-        cls=(),
+        pid=pid,
+        cls=cls,
     )
 
-    assert emitted_json(capsys) == [
-        {
-            'pid': 'pid-2',
-            'schema_type': 'Company',
-        },
-        {
-            'pid': 'pid-1',
-            'schema_type': 'Person',
-        },
-    ]
+    assert output_records(result.out) == expected
 
 
-def test_missing_pid_raises_value_error():
-    record_cache = {
-        'pid-1': {
-            'pid': 'pid-1',
-            'schema_type': 'Person',
-        },
-    }
+def test_missing_pid_raises_click_exception(run_callback, capsys):
+    record_cache = RecordCache(data={'pid-1': person})
 
-    with pytest.raises(
-        click.ClickException,
-        match=r'missing',
-    ):
-        cli.callback(
+    with pytest.raises(click.ClickException, match='No record'):
+        run_callback(
+            cli.callback,
             record_cache=record_cache,
             pid=('missing',),
             cls=(),
         )
 
+    assert capsys.readouterr().out == ''
 
-def test_missing_pid_error_stops_processing(capsys):
-    record_cache = {
-        'pid-1': {
-            'pid': 'pid-1',
-            'schema_type': 'Person',
-        },
-    }
+
+def test_missing_pid_error_stops_processing(run_callback, capsys):
+    record_cache = RecordCache(data={'pid-1': person})
 
     with pytest.raises(click.ClickException):
-        cli.callback(
+        run_callback(
+            cli.callback,
             record_cache=record_cache,
             pid=('pid-1', 'missing'),
             cls=(),
         )
-    # no partial report
-    assert emitted_json(capsys) == []
 
-
-def test_pid_filter_takes_precedence_over_class_filter(capsys):
-    record_cache = {
-        'pid-1': {
-            'pid': 'pid-1',
-            'schema_type': 'Person',
-        },
-        'pid-2': {
-            'pid': 'pid-2',
-            'schema_type': 'Company',
-        },
-    }
-
-    cli.callback(
-        record_cache=record_cache,
-        pid=('pid-2',),
-        cls=('Person',),
-    )
-
-    assert emitted_json(capsys) == [
-        {
-            'pid': 'pid-2',
-            'schema_type': 'Company',
-        }
-    ]
+    assert capsys.readouterr().out == ''

@@ -1,58 +1,62 @@
 import json
 
 import pytest
-from click.testing import CliRunner
 
 from query_things.inject_links_pid import _proc_record, cli
+from query_things.tests import (
+    jsonl_lines,
+    make_record,
+)
 
-API_URL = 'https://example.test'
+API_URL = 'https://api.example.test'
 
 
-@pytest.fixture
-def linker_query(monkeypatch):
-    """Install a configurable mock for the Things client query."""
-    records_by_collection = {}
-    calls = []
+class FakeLinkQuery:
+    def __init__(self) -> None:
+        self.records: dict[str, list[tuple[dict, dict]]] = {}
+        self.calls: list[dict] = []
 
-    def fake_collection_read_records_of_class(
+    def __call__(
+        self,
         api_url,
         collection,
         class_name,
         matching,
         token=None,
     ):
-        assert api_url == API_URL
-
-        calls.append(
+        self.calls.append(
             {
+                'api_url': api_url,
                 'collection': collection,
                 'class_name': class_name,
                 'matching': matching,
                 'token': token,
             }
         )
-
-        return records_by_collection.get(collection, [])
-
-    monkeypatch.setattr(
-        'query_things.inject_links_pid.collection_read_records_of_class',
-        fake_collection_read_records_of_class,
-    )
-
-    return records_by_collection, calls
+        return self.records.get(collection, [])
 
 
 @pytest.fixture
-def process_record(linker_query):  # noqa: ARG001
+def link_query(monkeypatch: pytest.MonkeyPatch) -> FakeLinkQuery:
+    fake = FakeLinkQuery()
+    monkeypatch.setattr(
+        'query_things.inject_links_pid.collection_read_records_of_class',
+        fake,
+    )
+    return fake
+
+
+@pytest.fixture
+def process_record(link_query: FakeLinkQuery):  # noqa: ARG001
     def _process(
-        record,
+        record: dict,
         *,
-        inject='links',
-        collections=('public',),
-        link=('related',),
-        class_name=None,
-        token=None,
-    ):
+        inject: str = 'people',
+        collections: tuple[str, ...] = ('public',),
+        link: tuple[str, ...] = ('projects',),
+        class_name: str | None = None,
+        token: str | None = None,
+    ) -> dict:
         _proc_record(
             record,
             inject=inject,
@@ -69,25 +73,17 @@ def process_record(linker_query):  # noqa: ARG001
 
 def test_injects_linking_records_into_missing_property(
     process_record,
-    linker_query,
+    link_query,
 ):
-    records_by_collection, calls = linker_query
-    records_by_collection['public'] = [
-        (
-            {
-                'pid': 'person:1',
-                'schema_type': 'Person',
-                'related': 'dataset:1',
-            },
-            {},
-        ),
-    ]
+    linker = make_record(
+        'person:1',
+        schema_type='Person',
+        related='dataset:1',
+    )
+    link_query.records['public'] = [(linker, {})]
 
     record = process_record(
-        {
-            'pid': 'dataset:1',
-            'title': 'Example dataset',
-        },
+        make_record('dataset:1', title='Example dataset'),
         inject='injected_people',
         link=('related',),
         class_name='Person',
@@ -97,17 +93,12 @@ def test_injects_linking_records_into_missing_property(
     assert record == {
         'pid': 'dataset:1',
         'title': 'Example dataset',
-        'injected_people': [
-            {
-                'pid': 'person:1',
-                'schema_type': 'Person',
-                'related': 'dataset:1',
-            },
-        ],
+        'injected_people': [linker],
     }
 
-    assert calls == [
+    assert link_query.calls == [
         {
+            'api_url': API_URL,
             'collection': 'public',
             'class_name': 'Person',
             'matching': 'dataset:1',
@@ -116,180 +107,91 @@ def test_injects_linking_records_into_missing_property(
     ]
 
 
-def test_appends_linking_records_to_existing_list(
-    process_record,
-    linker_query,
-):
-    records_by_collection, _ = linker_query
-    records_by_collection['public'] = [
-        (
-            {
-                'pid': 'project:1',
-                'name': 'Project One',
-                'datasets': ['dataset:1'],
-            },
-            {},
-        ),
-    ]
+def test_appends_linking_records_to_existing_list(process_record, link_query):
+    linker = make_record(
+        'project:1',
+        name='Project One',
+        datasets=['dataset:1'],
+    )
+    link_query.records['public'] = [(linker, {})]
+
+    existing = [make_record('project:existing', name='Existing project')]
 
     record = process_record(
-        {
-            'pid': 'dataset:1',
-            'projects': [
-                {
-                    'pid': 'project:existing',
-                    'name': 'Existing project',
-                },
-            ],
-        },
+        make_record('dataset:1', projects=existing),
         inject='projects',
         link=('datasets',),
     )
 
-    assert record['projects'] == [
-        {
-            'pid': 'project:existing',
-            'name': 'Existing project',
-        },
-        {
-            'pid': 'project:1',
-            'name': 'Project One',
-            'datasets': ['dataset:1'],
-        },
-    ]
+    assert record['projects'] == [*existing, linker]
 
 
-def test_converts_existing_scalar_to_list(
-    process_record,
-    linker_query,
-):
-    records_by_collection, _ = linker_query
-    records_by_collection['public'] = [
-        (
-            {
-                'pid': 'person:1',
-                'name': 'New person',
-                'projects': ['project:1'],
-            },
-            {},
-        ),
-    ]
+def test_converts_existing_scalar_to_list(process_record, link_query):
+    linker = make_record(
+        'person:1',
+        name='New person',
+        projects=['project:1'],
+    )
+    link_query.records['public'] = [(linker, {})]
+
+    existing = make_record('person:existing', name='Existing person')
 
     record = process_record(
-        {
-            'pid': 'project:1',
-            'people': {
-                'pid': 'person:existing',
-                'name': 'Existing person',
-            },
-        },
+        make_record('project:1', people=existing),
         inject='people',
         link=('projects',),
     )
 
-    assert record['people'] == [
-        {
-            'pid': 'person:existing',
-            'name': 'Existing person',
-        },
-        {
-            'pid': 'person:1',
-            'name': 'New person',
-            'projects': ['project:1'],
-        },
-    ]
+    assert record['people'] == [existing, linker]
 
 
-def test_queries_each_configured_collection(
-    process_record,
-    linker_query,
-):
-    records_by_collection, calls = linker_query
-    records_by_collection['private'] = [
-        (
-            {
-                'pid': 'person:private',
-                'projects': ['project:1'],
-            },
-            {},
-        ),
-    ]
+def test_queries_each_configured_collection(process_record, link_query):
+    link_query.records['public'] = []
+    linker = make_record('person:private', projects=['project:1'])
+    link_query.records['private'] = [(linker, {})]
 
     record = process_record(
-        {'pid': 'project:1'},
+        make_record('project:1'),
         inject='people',
         collections=('public', 'private'),
         link=('projects',),
         class_name='Person',
     )
 
-    assert [call['collection'] for call in calls] == [
+    assert [call['collection'] for call in link_query.calls] == [
         'public',
         'private',
     ]
-    assert record['people'] == [
-        {
-            'pid': 'person:private',
-            'projects': ['project:1'],
-        },
-    ]
+    assert record['people'] == [linker]
 
 
 def test_multiple_link_properties_match_with_or_semantics(
     process_record,
-    linker_query,
+    link_query,
 ):
-    records_by_collection, _ = linker_query
-    records_by_collection['public'] = [
-        (
-            {
-                'pid': 'person:1',
-                'projects': ['project:1'],
-                'datasets': ['dataset:1'],
-            },
-            {},
-        ),
-    ]
+    linker = make_record(
+        'person:1',
+        projects=['project:1'],
+        datasets=['dataset:1'],
+    )
+    link_query.records['public'] = [(linker, {})]
 
     record = process_record(
-        {'pid': 'dataset:1'},
+        make_record('dataset:1'),
         inject='people',
         link=('projects', 'datasets'),
     )
 
-    assert record['people'] == [
-        {
-            'pid': 'person:1',
-            'projects': ['project:1'],
-            'datasets': ['dataset:1'],
-        }
-    ]
+    assert record['people'] == [linker]
 
 
-def test_matches_scalar_and_object_link_values(
-    process_record,
-    linker_query,
-):
-    records_by_collection, _ = linker_query
-    records_by_collection['public'] = [
-        (
-            {
-                'pid': 'person:scalar',
-                'related': 'dataset:1',
-            },
-            {},
-        ),
-        (
-            {
-                'pid': 'person:object',
-                'related': {'object': 'dataset:1'},
-            },
-            {},
-        ),
-    ]
+def test_matches_scalar_and_object_link_values(process_record, link_query):
+    scalar = make_record('person:scalar', related='dataset:1')
+    object_link = make_record('person:object', related={'object': 'dataset:1'})
+    link_query.records['public'] = [(scalar, {}), (object_link, {})]
 
     record = process_record(
-        {'pid': 'dataset:1'},
+        make_record('dataset:1'),
         inject='people',
         link=('related',),
     )
@@ -300,19 +202,10 @@ def test_matches_scalar_and_object_link_values(
     ]
 
 
-def test_cli_wires_arguments_and_json_lines(linker_query):
-    records_by_collection, _ = linker_query
-    records_by_collection['public'] = [
-        (
-            {
-                'pid': 'person:1',
-                'related': 'dataset:1',
-            },
-            {},
-        ),
-    ]
+def test_cli_wires_arguments_and_json_lines(runner, link_query):
+    linker = make_record('person:1', related='dataset:1')
+    link_query.records['public'] = [(linker, {})]
 
-    runner = CliRunner()
     result = runner.invoke(
         cli,
         [
@@ -322,16 +215,11 @@ def test_cli_wires_arguments_and_json_lines(linker_query):
             '--api-url',
             API_URL,
         ],
-        input=json.dumps({'pid': 'dataset:1'}) + '\n',
+        input=jsonl_lines(make_record('dataset:1')),
     )
 
     assert result.exit_code == 0, result.output
     assert json.loads(result.output) == {
         'pid': 'dataset:1',
-        'people': [
-            {
-                'pid': 'person:1',
-                'related': 'dataset:1',
-            },
-        ],
+        'people': [linker],
     }

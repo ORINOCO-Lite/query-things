@@ -1,13 +1,10 @@
-import json
-
 import pytest
-from click.testing import CliRunner
 from jinja2 import Environment
 
-from query_things.render_record import (
-    _proc_rec,
-    cli,
-    toyaml,
+from query_things.render_record import _proc_rec, cli, toyaml
+from query_things.tests import (
+    jsonl_lines,
+    make_record,
 )
 
 
@@ -18,179 +15,131 @@ def jinja_env():
     return env
 
 
-def test_proc_rec_renders_record_to_output_file(
-    tmp_path,
-    jinja_env,
-):
-    template = jinja_env.from_string('Name: {{ name }}\nPID: {{ pid }}\n')
+@pytest.fixture
+def render_record(tmp_path, jinja_env):
+    """Render a record with `_proc_rec` and return the generated file path."""
 
-    record = {
-        'pid': 'EXAMPLE:123',
-        'name': 'Example record',
-    }
+    def _render(record, template_source, output_templates, env=None):
+        template = (env or jinja_env).from_string(template_source)
 
-    output_template = str(tmp_path / 'output' / '{__pid_curie_reference}.txt')
+        _proc_rec(
+            record,
+            template,
+            output_filename_template=tuple(output_templates),
+        )
 
-    _proc_rec(
-        record,
-        template,
-        output_filename_template=(output_template,),
+        files = [path for path in tmp_path.rglob('*') if path.is_file()]
+        assert len(files) == 1, f'Expected exactly one output file, got: {files}'
+        return files[0]
+
+    return _render
+
+
+def test_renders_record_to_output_file(render_record, tmp_path):
+    path = render_record(
+        make_record('EXAMPLE:123', name='Example record'),
+        'Name: {{ name }}\nPID: {{ pid }}\n',
+        [str(tmp_path / 'output' / '{__pid_curie_reference}.txt')],
     )
 
-    output_path = tmp_path / 'output' / '123.txt'
-
-    assert output_path.exists()
-    assert output_path.read_text() == ('Name: Example record\nPID: EXAMPLE:123')
-
-
-def test_proc_rec_makes_top_level_record_keys_available(
-    tmp_path,
-    jinja_env,
-):
-    template = jinja_env.from_string('{{ title }}\n{{ nested.value }}\n')
-
-    record = {
-        'pid': 'EXAMPLE:1',
-        'title': 'A title',
-        'nested': {
-            'value': 'A nested value',
-        },
-    }
-
-    output_path = tmp_path / 'output.txt'
-
-    _proc_rec(
-        record,
-        template,
-        output_filename_template=(str(output_path),),
+    assert path == tmp_path / 'output' / '123.txt'
+    assert path.read_text(encoding='utf-8') == (
+        'Name: Example record\nPID: EXAMPLE:123'
     )
 
-    assert output_path.read_text() == 'A title\nA nested value'
 
-
-def test_proc_rec_normalizes_annotations(
-    tmp_path,
-    jinja_env,
-):
-    template = jinja_env.from_string(
-        '{{ annotations.simple }}\n{{ annotations.complex }}\n'
+def test_makes_top_level_record_keys_available(render_record, tmp_path):
+    path = render_record(
+        make_record(
+            'EXAMPLE:1',
+            title='A title',
+            nested={'value': 'A nested value'},
+        ),
+        '{{ title }}\n{{ nested.value }}\n',
+        [str(tmp_path / 'output.txt')],
     )
 
-    record = {
-        'pid': 'EXAMPLE:1',
-        'annotations': {
+    assert path.read_text(encoding='utf-8') == 'A title\nA nested value'
+
+
+def test_normalizes_annotations(render_record, tmp_path):
+    record = make_record(
+        'EXAMPLE:1',
+        annotations={
             'simple': 'simple value',
             'complex': {
                 'annotation_value': 'complex value',
                 'other_field': 'discarded',
             },
         },
-    }
+    )
 
-    output_path = tmp_path / 'output.txt'
-
-    _proc_rec(
+    path = render_record(
         record,
-        template,
-        output_filename_template=(str(output_path),),
+        '{{ annotations.simple }}\n{{ annotations.complex }}\n',
+        [str(tmp_path / 'output.txt')],
     )
 
     assert record['annotations'] == {
         'simple': 'simple value',
         'complex': 'complex value',
     }
-    assert output_path.read_text() == ('simple value\ncomplex value')
+    assert path.read_text(encoding='utf-8') == 'simple value\ncomplex value'
 
 
-def test_proc_rec_handles_missing_annotations(
-    tmp_path,
-    jinja_env,
-):
-    template = jinja_env.from_string('{{ name }}')
-
-    record = {
-        'pid': 'EXAMPLE:1',
-        'name': 'No annotations',
-    }
-
-    output_path = tmp_path / 'output.txt'
-
-    _proc_rec(
-        record,
-        template,
-        output_filename_template=(str(output_path),),
+def test_handles_missing_annotations(render_record, tmp_path):
+    path = render_record(
+        make_record('EXAMPLE:1', name='No annotations'),
+        '{{ name }}',
+        [str(tmp_path / 'output.txt')],
     )
 
-    assert output_path.read_text() == 'No annotations'
+    assert path.read_text(encoding='utf-8') == 'No annotations'
 
 
-def test_proc_rec_uses_first_successful_output_filename_template(
-    tmp_path,
-    jinja_env,
-):
-    template = jinja_env.from_string('{{ name }}')
-
-    record = {
-        'pid': 'EXAMPLE:abc',
-        'name': 'Example',
-        'annotations': {},
-    }
+def test_uses_first_successful_output_filename_template(render_record, tmp_path):
+    record = make_record(
+        'EXAMPLE:abc',
+        name='Example',
+        annotations={},
+    )
 
     invalid_template = str(tmp_path / 'missing' / '{annotations[missing]}.txt')
     valid_template = str(tmp_path / 'records' / '{__pid_curie_reference}.txt')
 
-    _proc_rec(
+    path = render_record(
         record,
-        template,
-        output_filename_template=(
-            invalid_template,
-            valid_template,
-        ),
+        '{{ name }}',
+        [invalid_template, valid_template],
     )
 
-    output_path = tmp_path / 'records' / 'abc.txt'
-
-    assert output_path.exists()
-    assert output_path.read_text() == 'Example'
+    assert path == tmp_path / 'records' / 'abc.txt'
+    assert path.read_text(encoding='utf-8') == 'Example'
 
 
-def test_proc_rec_can_use_annotation_in_output_filename(
-    tmp_path,
-    jinja_env,
-):
-    template = jinja_env.from_string('{{ name }}')
-
-    record = {
-        'pid': 'EXAMPLE:abc',
-        'name': 'Example',
-        'annotations': {
+def test_can_use_annotation_in_output_filename(render_record, tmp_path):
+    record = make_record(
+        'EXAMPLE:abc',
+        name='Example',
+        annotations={
             'target_id': {
                 'annotation_value': 'target-123',
             },
         },
-    }
-
-    output_template = str(
-        tmp_path / 'content' / '{annotations[target_id]}' / '_index.md'
     )
 
-    _proc_rec(
+    path = render_record(
         record,
-        template,
-        output_filename_template=(output_template,),
+        '{{ name }}',
+        [str(tmp_path / 'content' / '{annotations[target_id]}' / '_index.md')],
     )
 
-    output_path = tmp_path / 'content' / 'target-123' / '_index.md'
-
-    assert output_path.exists()
-    assert output_path.read_text() == 'Example'
+    assert path == tmp_path / 'content' / 'target-123' / '_index.md'
+    assert path.read_text(encoding='utf-8') == 'Example'
 
 
-def test_proc_rec_provides_special_template_variables(
-    tmp_path,
-    jinja_env,
-):
-    template = jinja_env.from_string(
+def test_provides_special_template_variables(render_record, tmp_path):
+    template = (
         '{% if __datetime %}'
         'has datetime;'
         '{% endif %}'
@@ -201,62 +150,38 @@ def test_proc_rec_provides_special_template_variables(
         '{{ __rec.name }}'
     )
 
-    record = {
-        'pid': 'EXAMPLE:abc',
-        'name': 'Example',
-    }
-
-    output_path = tmp_path / 'output.txt'
-
-    _proc_rec(
-        record,
+    path = render_record(
+        make_record('EXAMPLE:abc', name='Example'),
         template,
-        output_filename_template=(str(output_path),),
+        [str(tmp_path / 'output.txt')],
     )
 
-    assert output_path.read_text() == ('has datetime;has datetime_now;abc;Example')
-
-
-def test_proc_rec_provides_toyaml_filter(
-    tmp_path,
-    jinja_env,
-):
-    template = jinja_env.from_string('{{ data | toyaml }}')
-
-    record = {
-        'pid': 'EXAMPLE:1',
-        'data': {
-            'name': 'Example',
-            'values': [1, 2, 3],
-        },
-    }
-
-    output_path = tmp_path / 'output.yaml'
-
-    _proc_rec(
-        record,
-        template,
-        output_filename_template=(str(output_path),),
+    assert path.read_text(encoding='utf-8') == (
+        'has datetime;has datetime_now;abc;Example'
     )
 
-    assert output_path.read_text() == ('name: Example\nvalues:\n- 1\n- 2\n- 3\n')
+
+def test_provides_toyaml_filter(render_record, tmp_path):
+    path = render_record(
+        make_record(
+            'EXAMPLE:1',
+            data={
+                'name': 'Example',
+                'values': [1, 2, 3],
+            },
+        ),
+        '{{ data | toyaml }}',
+        [str(tmp_path / 'output.yaml')],
+    )
+
+    assert path.read_text(encoding='utf-8') == (
+        'name: Example\nvalues:\n- 1\n- 2\n- 3\n'
+    )
 
 
-def test_proc_rec_raises_when_all_filename_templates_fail(
-    tmp_path,
-    jinja_env,
-):
+def test_raises_when_all_filename_templates_fail(tmp_path, jinja_env):
     template = jinja_env.from_string('{{ name }}')
-
-    record = {
-        'pid': 'EXAMPLE:1',
-        'name': 'Example',
-    }
-
-    output_templates = (
-        str(tmp_path / '{missing_key}.txt'),
-        str(tmp_path / '{annotations[missing_annotation]}.txt'),
-    )
+    record = make_record('EXAMPLE:1', name='Example')
 
     with pytest.raises(
         ValueError,
@@ -265,11 +190,14 @@ def test_proc_rec_raises_when_all_filename_templates_fail(
         _proc_rec(
             record,
             template,
-            output_filename_template=output_templates,
+            output_filename_template=(
+                str(tmp_path / '{missing_key}.txt'),
+                str(tmp_path / '{annotations[missing_annotation]}.txt'),
+            ),
         )
 
 
-def test_proc_rec_supports_custom_jinja_delimiters(tmp_path):
+def test_supports_custom_jinja_delimiters(render_record, tmp_path):
     env = Environment(
         block_start_string='[% ',
         block_end_string=' %]',
@@ -279,44 +207,32 @@ def test_proc_rec_supports_custom_jinja_delimiters(tmp_path):
         comment_end_string='!#]',
         autoescape=True,
     )
+    env.filters['toyaml'] = toyaml
 
-    template = env.from_string('[[ name ]]')
-
-    record = {
-        'pid': 'EXAMPLE:1',
-        'name': 'Custom delimiters',
-    }
-
-    output_path = tmp_path / 'output.txt'
-
-    _proc_rec(
-        record,
-        template,
-        output_filename_template=(str(output_path),),
+    path = render_record(
+        make_record('EXAMPLE:1', name='Custom delimiters'),
+        '[[ name ]]',
+        [str(tmp_path / 'output.txt')],
+        env=env,
     )
 
-    assert output_path.read_text() == 'Custom delimiters'
+    assert path.read_text(encoding='utf-8') == 'Custom delimiters'
 
 
-def test_cli_reads_json_records_from_stdin(tmp_path):
+def test_cli_reads_json_records_from_stdin(runner, tmp_path):
     template_path = tmp_path / 'record.j2'
-    template_path.write_text('Name: {{ name }}')
+    template_path.write_text('Name: {{ name }}', encoding='utf-8')
 
     output_path = tmp_path / 'output.txt'
 
-    record = {
-        'pid': 'EXAMPLE:1',
-        'name': 'Example',
-    }
-
-    result = CliRunner().invoke(
+    result = runner.invoke(
         cli,
         [
             str(template_path),
             str(output_path),
         ],
-        input=json.dumps(record) + '\n',
+        input=jsonl_lines(make_record('EXAMPLE:1', name='Example')),
     )
 
     assert result.exit_code == 0, result.output
-    assert output_path.read_text() == 'Name: Example'
+    assert output_path.read_text(encoding='utf-8') == 'Name: Example'
