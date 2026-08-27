@@ -27,6 +27,20 @@ The following operations are supported via individual `query-things` subcommands
 | `list` | List records currently held in the record cache, optionally restricted by PID or schema class. |
 
 
+## Upgrades from previous versions
+
+### `inline-records`
+
+Early versions had this command. It has been replaced by `inline-things`. In
+all but one case, `inline-things` is a drop-in replacement for
+`inline-records`. Example where a `-p` options points to an association class
+records (e.g., an `Attribution` via `attributed_to`) with the object of
+interested is located under an `object` key. The former `inline-records`
+appended this automatically to, but `inline-things` does not. This makes the
+new command more flexible and also enables the support for inlining at
+arbitrary depth.
+
+
 ## Related solutions
 
 - [dump-things-service](https://hub.psychoinformatics.de/orinoco/dump-things-service) metadata backend
