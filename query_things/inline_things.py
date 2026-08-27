@@ -13,7 +13,7 @@ from query_things.common import (
 
 
 def is_pid_like(value: object) -> bool:
-    return isinstance(value, str) and bool(value) and ":" in value
+    return isinstance(value, str) and bool(value) and ':' in value
 
 
 def inline_value(
