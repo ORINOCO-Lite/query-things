@@ -92,3 +92,54 @@ def all_records_have_links(
         )
         for prop, pid in links
     )
+
+
+def record_has_link_any(
+    rec: dict | None,
+    prop: str,
+    target_pids: Iterable[str],
+    resolver: Callable[[str], dict | None] | None = None,
+    *,
+    recursive: bool = False,
+    visited: frozenset[str] | None = None,
+) -> bool:
+    """
+    Return True if rec has a link to any target PID via prop.
+
+    If recursive=True and resolver is provided, follow linked PIDs.
+    """
+    if rec is None:
+        return False
+
+    if prop not in rec:
+        return False
+
+    targets = set(target_pids)
+    if not targets:
+        return False
+
+    if visited is None:
+        visited = frozenset()
+
+    for pid in iter_link_pids(rec.get(prop)):
+        if isinstance(pid, str) and pid in targets:
+            return True
+
+        if (
+            recursive
+            and resolver is not None
+            and isinstance(pid, str)
+            and pid not in visited
+        ):
+            linked_rec = resolver(pid)
+            if record_has_link_any(
+                linked_rec,
+                prop,
+                targets,
+                resolver=resolver,
+                recursive=True,
+                visited=visited | {pid},
+            ):
+                return True
+
+    return False

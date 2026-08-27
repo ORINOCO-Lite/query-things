@@ -14,6 +14,7 @@ from .linking import (  # noqa: TID252
     all_records_have_links,
     iter_link_pids,
     record_has_link,
+    record_has_link_any,
 )
 from .records import homogenize_annotations  # noqa: TID252
 
@@ -25,6 +26,7 @@ __all__ = [
     'iter_link_pids',
     'make_record_resolver',
     'record_has_link',
+    'record_has_link_any',
     'stdargs',
 ]
 

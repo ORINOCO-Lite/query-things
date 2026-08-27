@@ -1,22 +1,60 @@
+from pathlib import Path
+
 import click
 
 from query_things.common import (
     RecordCache,
-    all_records_have_links,
     iter_json_objects,
     make_record_resolver,
+    record_has_link,
+    record_has_link_any,
     stdargs,
 )
+
+
+def _read_pids(path: Path | str) -> frozenset[str]:
+    """Read PIDs from a file, one PID per line. Blank lines are ignored."""
+    path = Path(path)
+    try:
+        with path.open('r', encoding='utf-8') as fp:
+            return frozenset(line.strip() for line in fp if line.strip())
+    except (OSError, UnicodeDecodeError) as e:
+        msg = f'Cannot read PID file {path}: {e}'
+        raise click.ClickException(msg) from e
 
 
 @click.command('filter-links-pid')
 @click.option(
     '--link',
-    help='Linkage target, linking property and target PID',
+    help=(
+        'Linking property and target PID. Can be given multiple times. '
+        'At least one of --link or --link-from-file is required.'
+    ),
     metavar='<PROPERTY> <PID>',
     multiple=True,
     nargs=2,
-    required=True,
+)
+@click.option(
+    '--link-from-file',
+    'link_from_file',
+    help=(
+        'Linking property and file with target PIDs, one PID per line. '
+        'A record matches this option if it links to any PID in the file '
+        'via the property. Can be given multiple times.'
+    ),
+    metavar='<PROPERTY> <FILE>',
+    multiple=True,
+    nargs=2,
+    type=(
+        click.STRING,
+        click.Path(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            path_type=Path,
+        ),
+    ),
 )
 @click.option(
     '--recursive',
@@ -35,13 +73,22 @@ from query_things.common import (
 )
 def cli(
     link: tuple[tuple[str, str], ...],
+    link_from_file: tuple[tuple[str, Path], ...],
     recursive: bool,  # noqa: FBT001
     api_url: str,
     token: str | None,
     record_cache: RecordCache,
     collection: tuple[str, ...] = ('public',),
 ):
-    """Filter records by links to a specific PID"""
+    """Filter records by links to a specific PID or PIDs in a file
+
+    The linkage is constrained by a given property for each --link declaration.
+    When more than one --link or --link-from-file option is given, a record
+    has to have a matching link for each one of them.
+    """
+    if not link and not link_from_file:
+        msg = 'At least one of --link or --link-from-file must be provided.'
+        raise click.UsageError(msg)
 
     resolver = make_record_resolver(
         api_url=api_url,
@@ -50,11 +97,26 @@ def cli(
         token=token,
     )
 
+    file_links = [(prop, _read_pids(path)) for prop, path in link_from_file]
+
     for line, rec in iter_json_objects():
-        if all_records_have_links(
-            rec,
-            link,
-            resolver=resolver,
-            recursive=recursive,
+        if all(
+            record_has_link(
+                rec,
+                prop,
+                pid,
+                resolver=resolver,
+                recursive=recursive,
+            )
+            for prop, pid in link
+        ) and all(
+            record_has_link_any(
+                rec,
+                prop,
+                pids,
+                resolver=resolver,
+                recursive=recursive,
+            )
+            for prop, pids in file_links
         ):
             click.echo(line, nl=False)
