@@ -1,36 +1,19 @@
-import json
-import sys
-from contextlib import suppress
-
-import click
+from collections.abc import Iterable, Iterator
 
 from query_things.common import (
     RecordCache,
-    stdargs,
+    try_parse_record,
 )
 
 
-@click.command('cache')
-@click.option('--record-cache', **stdargs['--record-cache'])  # type: ignore[arg-type]
-def cli(
-    record_cache: RecordCache,
-):
-    """Cache JSON records and pass them through
+def cache_records(lines: Iterable[str], cache: RecordCache) -> Iterator[str]:
+    """Store JSON records from `lines` in `cache`, passing them through.
 
-    When a record cache is configured, this command stores any records
-    read from STDIN in it. Input that fails to JSON-load, or does not
-    have a `pid` property is silently ignore and not put into the cache.
-
-    Any input lines, regardless of cache configuration and validity are
-    copied to STDOUT.
+    Lines that are not JSON objects with a string `pid` property are
+    silently ignored by the cache, but are still yielded.
     """
-    for line in sys.stdin:
-        try:
-            rec = json.loads(line)
-            with suppress(KeyError):
-                # silently ignore a record without a PID
-                record_cache[rec['pid']] = rec
-        except ValueError:
-            # silently ignore non-JSON input
-            pass
-        click.echo(line, nl=False)
+    for line in lines:
+        rec = try_parse_record(line)
+        if rec is not None:
+            cache[rec['pid']] = rec
+        yield line

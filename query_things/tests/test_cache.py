@@ -1,6 +1,6 @@
 import pytest
 
-from query_things.cache import cli
+from query_things.cli.cache import cli
 from query_things.common.cache import RecordCache
 from query_things.tests import (
     cache_as_dict,
