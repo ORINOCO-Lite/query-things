@@ -69,13 +69,3 @@ class RecordCache:
 
         with self._path.open('w') as fp:
             json.dump(self._data, fp)
-
-
-def _handle_record_cache(ctx, _, value) -> RecordCache:
-    cache = RecordCache.load(value)
-
-    @ctx.call_on_close
-    def dump_cache():
-        cache.save()
-
-    return cache
