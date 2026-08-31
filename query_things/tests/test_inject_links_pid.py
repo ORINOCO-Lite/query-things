@@ -2,7 +2,8 @@ import json
 
 import pytest
 
-from query_things.inject_links_pid import _proc_record, cli
+from query_things.cli.inject_links_pid import cli
+from query_things.inject_links_pid import _proc_record
 from query_things.tests import (
     jsonl_lines,
     make_record,

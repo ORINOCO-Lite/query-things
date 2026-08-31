@@ -1,68 +1,46 @@
 import json
+from collections.abc import Iterable, Iterator
 from typing import Any
 
-import click
 from dump_things_pyclient.communicate import (  # type: ignore[import-untyped]
     collection_read_records_of_class,
 )
 
 from query_things.common import (
-    RecordCache,
-    iter_json_objects,
+    parse_json_objects,
     record_has_link,
-    stdargs,
 )
 
 
-@click.command('inject-links-pid')
-@click.argument('inject')
-@click.option(
-    '--link',
-    help='Linking property. Can be given multiple times.',
-    metavar='<PROPERTY>',
-    multiple=True,
-    required=True,
-)
-@click.option(
-    '--class',
-    '-C',
-    'class_name',
-    help='Constrain injected objects to this class',
-)
-@click.option('--api-url', **stdargs['--api-url'])  # type: ignore[arg-type]
-@click.option('--token', **stdargs['--token'])  # type: ignore[arg-type]
-@click.option('--record-cache', **stdargs['--record-cache'])  # type: ignore[arg-type]
-@click.option(
-    '-c',
-    '--collection',
-    multiple=True,
-    help='Collection to query. Can be given multiple times.',
-    default=('public',),
-    **stdargs['collection'],  # type: ignore[arg-type]
-)
-def cli(
+def inject_links_pid(
+    lines: Iterable[str],
+    *,
     inject: str,
     link: tuple[str, ...],
-    class_name: str | None,
     api_url: str,
-    token: str | None,
-    record_cache: RecordCache,  # noqa: ARG001
-    collection: tuple[str, ...] = ('public',),
-):
-    """Inject records that link to each input record"""
-    for _, rec in iter_json_objects():
+    collections: tuple[str, ...] = ('public',),
+    class_name: str | None = None,
+    token: str | None = None,
+) -> Iterator[str]:
+    """Yield input records with linking records injected at `inject`.
+
+    For each input record, records from the given collections are looked
+    up that link to the record via any of the given `link` properties.
+    Those records are added to the value of the `inject` property: the
+    property is created if absent, extended if it is a list, or promoted
+    to a list if it holds a single value.
+    """
+    for _, rec in parse_json_objects(lines):
         _proc_record(
             rec,
             inject=inject,
-            collections=collection,
+            collections=collections,
             link=link,
             class_name=class_name,
             api_url=api_url,
             token=token,
         )
-        click.echo(
-            json.dumps(rec, ensure_ascii=True, separators=(',', ':')),
-        )
+        yield json.dumps(rec, ensure_ascii=True, separators=(',', ':'))
 
 
 def _proc_record(
