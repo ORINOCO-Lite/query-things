@@ -1,8 +1,8 @@
 import click
 import pytest
 
+from query_things.cli.list import cli
 from query_things.common.cache import RecordCache
-from query_things.list import cli
 from query_things.tests import (
     make_record,
     output_records,

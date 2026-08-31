@@ -1,12 +1,12 @@
 import json
+from typing import cast
 
 import click
 from click_option_group import MutuallyExclusiveOptionGroup, optgroup
 
-from query_things.common import (
-    RecordCache,
-    stdargs,
-)
+from query_things.cli._options import stdargs
+from query_things.common import RecordCache
+from query_things.list_records import list_records
 
 
 @click.command('list')
@@ -35,30 +35,13 @@ def cli(
     By default reports all records in the cache in JSON-lines format.
     The report can be constrained by record PIDs or class(es).
     """
-    if pid:
-        results = []
-        missing = []
+    try:
+        records = list(list_records(record_cache, pid=pid or (), cls=cls or ()))
+    except KeyError as e:
+        missing = cast('list[str]', e.args[0])
+        raise click.ClickException(
+            'No record(s) in cache: ' + ', '.join(repr(p) for p in missing)
+        ) from e
 
-        for p in pid:
-            rec = record_cache.get(p)
-            if rec is None:
-                missing.append(p)
-            else:
-                results.append(rec)
-
-        if missing:
-            raise click.ClickException(
-                'No record(s) in cache: ' + ', '.join(repr(p) for p in missing)
-            )
-
-        for rec in results:
-            click.echo(json.dumps(rec), nl=True)
-        return
-
-    # for all other scenarios we need to loop over all records
-    for rec in record_cache.values():
-        if rec is None:
-            continue
-        if cls and rec.get('schema_type') not in cls:
-            continue
+    for rec in records:
         click.echo(json.dumps(rec), nl=True)
