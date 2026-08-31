@@ -1,9 +1,9 @@
 from pathlib import Path
 
-import click
 import pytest
 
-from query_things.filter_links_pid import _read_pids, cli
+from query_things.cli.filter_links_pid import cli
+from query_things.filter_links_pid import read_pids
 from query_things.tests import (
     jsonl_lines,
     make_record,
@@ -418,19 +418,19 @@ def test_read_pids(tmp_path, content, expected):
     path = tmp_path / 'pids.txt'
     path.write_text(content, encoding='utf-8')
 
-    assert _read_pids(path) == expected
+    assert read_pids(path) == expected
 
 
 def test_read_pids_accepts_string_path(tmp_path):
     path = tmp_path / 'pids.txt'
     path.write_text('pid1\n', encoding='utf-8')
 
-    assert _read_pids(str(path)) == frozenset({'pid1'})
+    assert read_pids(str(path)) == frozenset({'pid1'})
 
 
 def test_read_pids_missing_file_raises(tmp_path):
-    with pytest.raises(click.ClickException):
-        _read_pids(tmp_path / 'missing.txt')
+    with pytest.raises(FileNotFoundError):
+        read_pids(tmp_path / 'missing.txt')
 
 
 def test_recursive_link_matches_indirect_link(invoke_filter):
