@@ -1,7 +1,8 @@
 import pytest
 from jinja2 import Environment
 
-from query_things.render_record import _proc_rec, cli, toyaml
+from query_things.cli.render_record import cli
+from query_things.render_record import _proc_rec, toyaml
 from query_things.tests import (
     jsonl_lines,
     make_record,
