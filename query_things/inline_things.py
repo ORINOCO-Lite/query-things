@@ -51,9 +51,22 @@ def walk(
     if isinstance(container, dict) and key in container:
         value = container[key]
 
+        # Resolve the value if it is a PID-like string
         if len(path) == 1:
             container[key] = inline_value(value, get_obj)
             return
+
+        # Attempt to inline a PID reference even when not at terminal path
+        resolved = inline_value(value, get_obj)
+        if resolved is not value:
+            container[key] = resolved
+            if isinstance(resolved, dict):
+                walk(resolved, path[1:], get_obj)
+                return
+            if isinstance(resolved, list):
+                for item in resolved:
+                    walk(item, path[1:], get_obj)
+                return
 
         if isinstance(value, dict):
             walk(value, path[1:], get_obj)
