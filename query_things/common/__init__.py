@@ -10,6 +10,7 @@ from .cache import (  # noqa: TID252
     _handle_record_cache,
 )
 from .io import iter_json_objects  # noqa: TID252
+from .jsonl import parse_json_objects, try_parse_record  # noqa: TID252
 from .linking import (  # noqa: TID252
     all_records_have_links,
     iter_link_pids,
@@ -25,9 +26,11 @@ __all__ = [
     'iter_json_objects',
     'iter_link_pids',
     'make_record_resolver',
+    'parse_json_objects',
     'record_has_link',
     'record_has_link_any',
     'stdargs',
+    'try_parse_record',
 ]
 
 # this collection cannot contain the help strings.
