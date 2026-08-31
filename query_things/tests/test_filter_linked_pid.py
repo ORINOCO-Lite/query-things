@@ -2,7 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from query_things.filter_linked_pid import cli
+from query_things.cli.filter_linked_pid import cli
 from query_things.tests import (
     jsonl_lines,
     make_record,

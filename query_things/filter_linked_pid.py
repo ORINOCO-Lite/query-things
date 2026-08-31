@@ -1,50 +1,38 @@
-import click
+from collections.abc import Iterable, Iterator
+from collections.abc import Set as AbstractSet
+
 from dump_things_pyclient.communicate import (  # type: ignore[import-untyped]
     collection_read_record_with_pid,
 )
 
 from query_things.common import (
-    iter_json_objects,
     iter_link_pids,
-    stdargs,
+    parse_json_objects,
 )
 
 
-@click.command('filter-linked-pid')
-# TODO: maybe later to invert the filter
-# @click.option('--ex
-@click.argument('collection', **stdargs['collection'])  # type: ignore[arg-type]
-@click.argument('pid')
-@click.argument('property')
-@click.option('--api-url', **stdargs['--api-url'])  # type: ignore[arg-type]
-@click.option('--token', **stdargs['--token'])  # type: ignore[arg-type]
-def cli(
+def get_reference_linked_pids(
     collection: str,
     pid: str,
     property: str,  # noqa: A002
     api_url: str,
     token: str | None = None,
-):
-    """Keep records linked from a reference
-
-    Incoming records are tested whether their `pid` appears
-    in the property of another record. Properties with
-    individual values, lists of values, or lists of association
-    class instances are equally supported.
-
-    Example use cases:
-
-    \b
-    - Match person records that are associated with a particular project
-    - Match topics a particular publication is about
-    """
+) -> frozenset[str]:
+    """Collect all PIDs linked via `property` by the referenced record."""
     ref = collection_read_record_with_pid(
         service_url=api_url,
         collection=collection,
         pid=pid,
         token=token,
     )
-    linked_pids = set(iter_link_pids(ref.get(property)))
-    for line, rec in iter_json_objects():
+    return frozenset(iter_link_pids(ref.get(property)))
+
+
+def filter_linked_pid(
+    lines: Iterable[str],
+    linked_pids: AbstractSet[str],
+) -> Iterator[str]:
+    """Yield only records whose `pid` is contained in `linked_pids`."""
+    for line, rec in parse_json_objects(lines):
         if rec['pid'] in linked_pids:
-            click.echo(line, nl=False)
+            yield line
