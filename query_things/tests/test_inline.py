@@ -50,6 +50,24 @@ def make_get_obj(records: dict[str, dict]):
             {},
             {'a': {'b': 'thing:1'}},
         ),
+        (
+            {'inf': [{'obj': 'ex:inf'}]},
+            ('inf', 'obj', 'att', 'obj'),
+            {
+                'ex:inf': {'pid': 'ex:inf', 'att': [{'obj': 'ex:att'}]},
+                'ex:att': {'pid': 'ex:att', 'dummy': 'yes'},
+            },
+            {
+                'inf': [
+                    {
+                        'obj': {
+                            'pid': 'ex:inf',
+                            'att': [{'obj': {'pid': 'ex:att', 'dummy': 'yes'}}],
+                        }
+                    }
+                ]
+            },
+        ),
     ],
 )
 def test_walk_inlines_pid_references(obj, path, records, expected):
