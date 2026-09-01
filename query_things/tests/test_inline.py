@@ -2,7 +2,10 @@ import copy
 
 import pytest
 
-from query_things.inline_things import inline_json_objects, walk
+from query_things.inline_things import (
+    inline_records,
+    walk,
+)
 
 
 def make_get_obj(records: dict[str, dict]):
@@ -78,7 +81,7 @@ def test_walk_inlines_pid_references(obj, path, records, expected):
     assert obj == expected
 
 
-def test_inline_json_objects_mutates_multiple_paths():
+def test_inline_records_mutates_multiple_paths():
     obj = {
         'author': 'person:1',
         'nested': {'thing': 'thing:2'},
@@ -88,7 +91,7 @@ def test_inline_json_objects_mutates_multiple_paths():
         'thing:2': {'pid': 'thing:2'},
     }
 
-    inline_json_objects(
+    inline_records(
         obj,
         [('author',), ('nested', 'thing')],
         make_get_obj(records),

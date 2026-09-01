@@ -1,10 +1,15 @@
+import json
 import sys
 
 import click
 
 from query_things.cli._options import stdargs
-from query_things.common import RecordCache, make_record_resolver
-from query_things.inline_things import inline_things
+from query_things.common import (
+    RecordCache,
+    make_record_resolver,
+    parse_json_objects,
+)
+from query_things.inline_things import inline_records
 
 
 @click.command('inline-things')
@@ -63,5 +68,12 @@ def cli(
 
     paths = [tuple(p.split('::')) for p in path]
 
-    for line in inline_things(sys.stdin, paths, resolver):
-        click.echo(line, nl=True)
+    for _, rec in parse_json_objects(sys.stdin):
+        inline_records(rec, paths, resolver)
+        click.echo(
+            json.dumps(
+                rec,
+                ensure_ascii=True,
+                separators=(',', ':'),
+            )
+        )

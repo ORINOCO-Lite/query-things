@@ -1,14 +1,11 @@
-import json
 from collections.abc import (
     Callable,
-    Iterable,
-    Iterator,
     Sequence,
 )
 from typing import Any
 
 from query_things.common import (
-    parse_json_objects,
+    Record,
 )
 
 
@@ -79,12 +76,12 @@ def walk(
             walk(item, path, get_obj)
 
 
-def inline_json_objects(
-    obj: dict[str, Any],
+def inline_records(
+    record: Record,
     paths: Sequence[Sequence[str]],
-    get_obj: Callable[[str], dict[str, Any] | None],
+    resolver: Callable[[str], Record | None],
 ) -> None:
-    """Mutate a JSON-like object in place by resolving object PID references.
+    """Mutate a record in place by resolving record PID references.
 
     For each key path in ``paths``, this function walks the input object. When
     it finds a string value containing a colon (``:``), it calls ``get_obj()``
@@ -93,15 +90,4 @@ def inline_json_objects(
     there using the remaining path.
     """
     for spec in paths:
-        walk(obj, tuple(spec), get_obj)
-
-
-def inline_things(
-    lines: Iterable[str],
-    paths: Sequence[Sequence[str]],
-    resolver: Callable[[str], dict | None],
-) -> Iterator[str]:
-    """Yield input records with PID references inlined at the given paths."""
-    for _, rec in parse_json_objects(lines):
-        inline_json_objects(rec, paths, resolver)
-        yield json.dumps(rec)
+        walk(record, tuple(spec), resolver)

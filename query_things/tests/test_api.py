@@ -14,7 +14,7 @@ from query_things.filter_linked_pid import (
 )
 from query_things.filter_links_pid import record_links_pid
 from query_things.inject_links_pid import inject_linking_records
-from query_things.inline_things import inline_things
+from query_things.inline_things import inline_records
 from query_things.list_records import list_records
 from query_things.tests import (
     cache_as_dict,
@@ -256,33 +256,27 @@ class TestInlineThings:
         rec = make_record('p:1', projects=[{'object': 'pr:1'}])
         records = {'pr:1': make_record('pr:1', name='Proj')}
 
-        out = list(
-            inline_things(
-                lines_of(rec),
-                [('projects', 'object')],
-                lambda pid: records.get(pid),
-            )
+        inline_records(
+            rec,
+            [('projects', 'object')],
+            lambda pid: records.get(pid),
         )
 
-        assert json.loads(out[0])['projects'] == [
-            {'object': make_record('pr:1', name='Proj')}
-        ]
+        assert rec['projects'] == [{'object': make_record('pr:1', name='Proj')}]
 
     def test_unresolved_reference_unchanged(self):
         rec = make_record('p:1', projects=[{'object': 'pr:1'}])
 
-        out = list(
-            inline_things(lines_of(rec), [('projects', 'object')], lambda _: None)
-        )
+        inline_records(rec, [('projects', 'object')], lambda _: None)
 
-        assert json.loads(out[0])['projects'] == [{'object': 'pr:1'}]
+        assert rec['projects'] == [{'object': 'pr:1'}]
 
     def test_no_paths_is_passthrough(self):
         rec = make_record('p:1', projects=[{'object': 'pr:1'}])
 
-        out = list(inline_things(lines_of(rec), [], lambda _: None))
+        inline_records(rec, [], lambda _: None)
 
-        assert json.loads(out[0]) == rec
+        assert rec == make_record('p:1', projects=[{'object': 'pr:1'}])
 
 
 class TestListRecords:
