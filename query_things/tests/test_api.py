@@ -9,8 +9,8 @@ from query_things.common import (
     parse_json_objects,
 )
 from query_things.filter_linked_pid import (
-    filter_linked_pid,
     get_reference_linked_pids,
+    record_matches_pids,
 )
 from query_things.filter_links_pid import record_links_pid
 from query_things.inject_links_pid import inject_links_pid
@@ -124,11 +124,9 @@ class TestFilterLinkedPid:
             )
 
     def test_filter_keeps_matching_records(self):
-        lines = lines_of(make_record('p:1'), make_record('p:2'), make_record('p:3'))
-
-        out = list(filter_linked_pid(lines, {'p:2'}))
-
-        assert out == [lines[1]]
+        pids = {'p:2'}
+        assert not record_matches_pids(make_record('p:1'), pids)
+        assert record_matches_pids(make_record('p:2'), pids)
 
 
 class TestFilterLinksPid:

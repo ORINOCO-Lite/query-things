@@ -3,9 +3,10 @@ import sys
 import click
 
 from query_things.cli._options import stdargs
+from query_things.common import parse_json_objects
 from query_things.filter_linked_pid import (
-    filter_linked_pid,
     get_reference_linked_pids,
+    record_matches_pids,
 )
 
 
@@ -45,5 +46,6 @@ def cli(
         token=token,
     )
 
-    for line in filter_linked_pid(sys.stdin, linked_pids):
-        click.echo(line, nl=False)
+    for line, rec in parse_json_objects(sys.stdin):
+        if record_matches_pids(rec, linked_pids):
+            click.echo(line, nl=False)

@@ -1,4 +1,3 @@
-from collections.abc import Iterable, Iterator
 from collections.abc import Set as AbstractSet
 
 from dump_things_pyclient.communicate import (  # type: ignore[import-untyped]
@@ -6,8 +5,8 @@ from dump_things_pyclient.communicate import (  # type: ignore[import-untyped]
 )
 
 from query_things.common import (
+    Record,
     iter_link_pids,
-    parse_json_objects,
 )
 
 
@@ -28,11 +27,9 @@ def get_reference_linked_pids(
     return frozenset(iter_link_pids(ref.get(property)))
 
 
-def filter_linked_pid(
-    lines: Iterable[str],
-    linked_pids: AbstractSet[str],
-) -> Iterator[str]:
-    """Yield only records whose `pid` is contained in `linked_pids`."""
-    for line, rec in parse_json_objects(lines):
-        if rec['pid'] in linked_pids:
-            yield line
+def record_matches_pids(
+    record: Record,
+    pids: AbstractSet[str],
+) -> bool:
+    """Returns whether the record's `pid` is contained in `pids`."""
+    return record['pid'] in pids
