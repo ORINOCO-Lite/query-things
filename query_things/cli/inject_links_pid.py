@@ -1,10 +1,14 @@
+import json
 import sys
 
 import click
 
 from query_things.cli._options import stdargs
-from query_things.common import RecordCache
-from query_things.inject_links_pid import inject_links_pid
+from query_things.common import (
+    RecordCache,
+    parse_json_objects,
+)
+from query_things.inject_links_pid import inject_linking_records
 
 
 @click.command('inject-links-pid')
@@ -43,13 +47,20 @@ def cli(
     collection: tuple[str, ...] = ('public',),
 ):
     """Inject records that link to each input record"""
-    for line in inject_links_pid(
-        sys.stdin,
-        inject=inject,
-        link=link,
-        api_url=api_url,
-        collections=collection,
-        class_name=class_name,
-        token=token,
-    ):
-        click.echo(line)
+    for _, rec in parse_json_objects(sys.stdin):
+        inject_linking_records(
+            rec,
+            inject=inject,
+            link=link,
+            api_url=api_url,
+            collections=collection,
+            class_name=class_name,
+            token=token,
+        )
+        click.echo(
+            json.dumps(
+                rec,
+                ensure_ascii=True,
+                separators=(',', ':'),
+            )
+        )

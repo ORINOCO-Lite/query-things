@@ -1,50 +1,15 @@
-import json
-from collections.abc import Iterable, Iterator
-from typing import Any
-
 from dump_things_pyclient.communicate import (  # type: ignore[import-untyped]
     collection_read_records_of_class,
 )
 
 from query_things.common import (
-    parse_json_objects,
+    Record,
     record_has_link,
 )
 
 
-def inject_links_pid(
-    lines: Iterable[str],
-    *,
-    inject: str,
-    link: tuple[str, ...],
-    api_url: str,
-    collections: tuple[str, ...] = ('public',),
-    class_name: str | None = None,
-    token: str | None = None,
-) -> Iterator[str]:
-    """Yield input records with linking records injected at `inject`.
-
-    For each input record, records from the given collections are looked
-    up that link to the record via any of the given `link` properties.
-    Those records are added to the value of the `inject` property: the
-    property is created if absent, extended if it is a list, or promoted
-    to a list if it holds a single value.
-    """
-    for _, rec in parse_json_objects(lines):
-        _proc_record(
-            rec,
-            inject=inject,
-            collections=collections,
-            link=link,
-            class_name=class_name,
-            api_url=api_url,
-            token=token,
-        )
-        yield json.dumps(rec, ensure_ascii=True, separators=(',', ':'))
-
-
-def _proc_record(
-    rec: dict[str, Any],
+def inject_linking_records(
+    record: Record,
     *,
     inject: str,
     collections: tuple[str, ...],
@@ -53,6 +18,13 @@ def _proc_record(
     class_name: str | None = None,
     token: str | None = None,
 ) -> None:
+    """Update input record with linking records injected at `inject`.
+
+    Records from the given collections are looked up that link to the given
+    record via any of the given `link` properties.  Those records are added to
+    the value of the `inject` property: the property is created if absent,
+    extended if it is a list, or promoted to a list if it holds a single value.
+    """
     linkers = []
     for col in collections:
         linkers.extend(
@@ -61,19 +33,19 @@ def _proc_record(
                 class_name,
                 api_url,
                 col,
-                rec['pid'],
+                record['pid'],
                 token=token,
             )
         )
-    target = rec.get(inject)
+    target = record.get(inject)
     if target is None:
-        rec[inject] = linkers
+        record[inject] = linkers
     elif isinstance(target, list):
         target.extend(linkers)
-        rec[inject] = target
+        record[inject] = target
     else:
         linkers.insert(0, target)
-        rec[inject] = linkers
+        record[inject] = linkers
 
 
 def get_any_thing_that_links_pid_via_x(

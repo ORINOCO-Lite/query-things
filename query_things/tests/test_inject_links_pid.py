@@ -3,7 +3,7 @@ import json
 import pytest
 
 from query_things.cli.inject_links_pid import cli
-from query_things.inject_links_pid import _proc_record
+from query_things.inject_links_pid import inject_linking_records
 from query_things.tests import (
     jsonl_lines,
     make_record,
@@ -58,7 +58,7 @@ def process_record(link_query: FakeLinkQuery):  # noqa: ARG001
         class_name: str | None = None,
         token: str | None = None,
     ) -> dict:
-        _proc_record(
+        inject_linking_records(
             record,
             inject=inject,
             collections=collections,

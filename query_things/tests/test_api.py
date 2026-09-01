@@ -13,7 +13,7 @@ from query_things.filter_linked_pid import (
     record_matches_pids,
 )
 from query_things.filter_links_pid import record_links_pid
-from query_things.inject_links_pid import inject_links_pid
+from query_things.inject_links_pid import inject_linking_records
 from query_things.inline_things import inline_things
 from query_things.list_records import list_records
 from query_things.tests import (
@@ -201,18 +201,15 @@ class TestInjectLinksPid:
             read.return_value = [
                 (make_record('pr:1', author=[{'object': 'p:1'}]), None)
             ]
-            out = list(
-                inject_links_pid(
-                    lines_of(rec),
-                    inject='projects',
-                    link=('author',),
-                    api_url='https://api',
-                    collections=('public',),
-                )
+            inject_linking_records(
+                rec,
+                inject='projects',
+                link=('author',),
+                api_url='https://api',
+                collections=('public',),
             )
 
-        assert len(out) == 1
-        assert json.loads(out[0])['projects'] == expected
+        assert rec['projects'] == expected
         read.assert_called_once()
         args, kwargs = read.call_args
         assert args[:2] == ('https://api', 'public')
@@ -225,14 +222,13 @@ class TestInjectLinksPid:
             'query_things.inject_links_pid.collection_read_records_of_class'
         ) as read:
             read.return_value = []
-            list(
-                inject_links_pid(
-                    lines_of(rec),
-                    inject='projects',
-                    link=('author',),
-                    api_url='https://api',
-                    class_name='Project',
-                )
+            inject_linking_records(
+                rec,
+                inject='projects',
+                link=('author',),
+                collections=['some'],
+                api_url='https://api',
+                class_name='Project',
             )
 
         args, _ = read.call_args
@@ -244,16 +240,15 @@ class TestInjectLinksPid:
             'query_things.inject_links_pid.collection_read_records_of_class'
         ) as read:
             read.return_value = [(make_record('pr:1', other='p:1'), None)]
-            out = list(
-                inject_links_pid(
-                    lines_of(rec),
-                    inject='projects',
-                    link=('author',),
-                    api_url='https://api',
-                )
+            inject_linking_records(
+                rec,
+                inject='projects',
+                link=('author',),
+                collections=['some'],
+                api_url='https://api',
             )
 
-        assert json.loads(out[0])['projects'] == []
+        assert rec['projects'] == []
 
 
 class TestInlineThings:
