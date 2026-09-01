@@ -1,3 +1,8 @@
+from typing import (
+    Any,
+    TypeAlias,
+)
+
 from .api import make_record_resolver  # noqa: TID252
 from .cache import RecordCache  # noqa: TID252
 from .jsonl import parse_json_objects, try_parse_record  # noqa: TID252
@@ -9,7 +14,12 @@ from .linking import (  # noqa: TID252
 )
 from .records import homogenize_annotations  # noqa: TID252
 
+# standard type to use anywhere a record goes
+Record: TypeAlias = dict[str, Any]
+
+
 __all__ = [
+    'Record',
     'RecordCache',
     'all_records_have_links',
     'homogenize_annotations',

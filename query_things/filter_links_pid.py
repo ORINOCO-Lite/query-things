@@ -1,13 +1,11 @@
 from collections.abc import (
     Callable,
-    Iterable,
-    Iterator,
     Sequence,
 )
 from pathlib import Path
 
 from query_things.common import (
-    parse_json_objects,
+    Record,
     record_has_link,
     record_has_link_any,
 )
@@ -20,38 +18,36 @@ def read_pids(path: Path | str) -> frozenset[str]:
         return frozenset(line.strip() for line in fp if line.strip())
 
 
-def filter_links_pid(
-    lines: Iterable[str],
+def record_links_pid(
+    rec: Record,
     links: Sequence[tuple[str, str]] = (),
     file_links: Sequence[tuple[str, frozenset[str]]] = (),
     resolver: Callable[[str], dict | None] | None = None,
     *,
     recursive: bool = False,
-) -> Iterator[str]:
-    """Yield records having all the given links.
+) -> bool:
+    """Return if record has all the given links.
 
     For each `links` entry, the record must link to the given target PID
     via the given property. For each `file_links` entry, the record must
     link to any of the given target PIDs via the given property.
     """
-    for line, rec in parse_json_objects(lines):
-        if all(
-            record_has_link(
-                rec,
-                prop,
-                pid,
-                resolver=resolver,
-                recursive=recursive,
-            )
-            for prop, pid in links
-        ) and all(
-            record_has_link_any(
-                rec,
-                prop,
-                pids,
-                resolver=resolver,
-                recursive=recursive,
-            )
-            for prop, pids in file_links
-        ):
-            yield line
+    return all(
+        record_has_link(
+            rec,
+            prop,
+            pid,
+            resolver=resolver,
+            recursive=recursive,
+        )
+        for prop, pid in links
+    ) and all(
+        record_has_link_any(
+            rec,
+            prop,
+            pids,
+            resolver=resolver,
+            recursive=recursive,
+        )
+        for prop, pids in file_links
+    )

@@ -4,10 +4,14 @@ from pathlib import Path
 import click
 
 from query_things.cli._options import stdargs
-from query_things.common import RecordCache, make_record_resolver
+from query_things.common import (
+    RecordCache,
+    make_record_resolver,
+    parse_json_objects,
+)
 from query_things.filter_links_pid import (
-    filter_links_pid,
     read_pids,
+    record_links_pid,
 )
 
 
@@ -62,6 +66,7 @@ from query_things.filter_links_pid import (
 def cli(
     link: tuple[tuple[str, str], ...],
     link_from_file: tuple[tuple[str, Path], ...],
+    *,
     recursive: bool,
     api_url: str,
     token: str | None,
@@ -87,11 +92,12 @@ def cli(
 
     file_links = [(prop, read_pids(path)) for prop, path in link_from_file]
 
-    for line in filter_links_pid(
-        sys.stdin,
-        links=link,
-        file_links=file_links,
-        resolver=resolver,
-        recursive=recursive,
-    ):
-        click.echo(line, nl=False)
+    for line, rec in parse_json_objects(sys.stdin):
+        if record_links_pid(
+            rec,
+            links=link,
+            file_links=file_links,
+            resolver=resolver,
+            recursive=recursive,
+        ):
+            click.echo(line, nl=False)

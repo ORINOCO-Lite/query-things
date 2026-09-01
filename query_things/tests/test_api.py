@@ -13,7 +13,7 @@ from query_things.filter_linked_pid import (
     filter_linked_pid,
     get_reference_linked_pids,
 )
-from query_things.filter_links_pid import filter_links_pid
+from query_things.filter_links_pid import record_links_pid
 from query_things.inject_links_pid import inject_links_pid
 from query_things.inline_things import inline_things
 from query_things.list_records import list_records
@@ -151,53 +151,47 @@ class TestFilterLinkedPid:
 
 
 class TestFilterLinksPid:
+    @staticmethod
+    def none_resolver(_) -> None:
+        return None
+
     def test_direct_link_matches(self):
         rec = make_record('p:1', projects=[{'object': 'pr:1'}])
         other = make_record('p:2')
-        lines = lines_of(rec, other)
 
-        out = list(
-            filter_links_pid(
-                lines, links=[('projects', 'pr:1')], resolver=lambda _: None
-            )
-        )
-
-        assert out == [lines[0]]
+        kwargs = {
+            'links': [('projects', 'pr:1')],
+            'resolver': TestFilterLinksPid.none_resolver,
+        }
+        assert record_links_pid(rec, **kwargs)
+        assert not record_links_pid(other, **kwargs)
 
     def test_all_links_required(self):
         rec = make_record('p:1', projects=[{'object': 'pr:1'}])
-        lines = lines_of(rec)
 
-        out = list(
-            filter_links_pid(
-                lines,
-                links=[('projects', 'pr:1'), ('projects', 'pr:2')],
-                resolver=lambda _: None,
-            )
+        assert not record_links_pid(
+            rec,
+            links=[('projects', 'pr:1'), ('projects', 'pr:2')],
+            resolver=TestFilterLinksPid.none_resolver,
         )
-
-        assert out == []
 
     def test_file_links_match_any(self):
         rec = make_record('p:1', related=['pr:2'])
-        lines = lines_of(rec)
 
-        out = list(
-            filter_links_pid(
-                lines,
-                file_links=[('related', frozenset({'pr:1', 'pr:2'}))],
-                resolver=lambda _: None,
-            )
+        assert record_links_pid(
+            rec,
+            file_links=[('related', frozenset({'pr:1', 'pr:2'}))],
+            resolver=TestFilterLinksPid.none_resolver,
         )
 
-        assert out == [lines[0]]
-
     def test_no_links_keeps_all(self):
-        lines = lines_of(make_record('p:1'), make_record('p:2'))
-
-        out = list(filter_links_pid(lines, resolver=lambda _: None))
-
-        assert out == lines
+        assert all(
+            record_links_pid(
+                rec,
+                resolver=TestFilterLinksPid.none_resolver,
+            )
+            for rec in (make_record('p:1'), make_record('p:2'))
+        )
 
 
 class TestInjectLinksPid:
