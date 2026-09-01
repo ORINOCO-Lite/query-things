@@ -1,11 +1,13 @@
-import json
 from typing import cast
 
 import click
 from click_option_group import MutuallyExclusiveOptionGroup, optgroup
 
 from query_things.cli._options import stdargs
-from query_things.common import RecordCache
+from query_things.common import (
+    RecordCache,
+    jsonl_from_record,
+)
 from query_things.list_records import list_records
 
 
@@ -44,4 +46,4 @@ def cli(
         ) from e
 
     for rec in records:
-        click.echo(json.dumps(rec), nl=True)
+        click.echo(jsonl_from_record(rec), nl=True)

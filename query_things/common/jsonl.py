@@ -1,5 +1,6 @@
 import json
 from collections.abc import Iterable, Iterator
+from typing import Any
 
 
 def parse_json_objects(lines: Iterable[str]) -> Iterator[tuple[str, dict]]:
@@ -29,3 +30,12 @@ def parse_json_objects(lines: Iterable[str]) -> Iterator[tuple[str, dict]]:
             raise ValueError(msg)  # noqa: TRY004
 
         yield line, rec
+
+
+def jsonl_from_record(record: dict[str, Any]) -> str:
+    """Render `record` as a JSON line string"""
+    return json.dumps(
+        record,
+        ensure_ascii=True,
+        separators=(',', ':'),
+    )

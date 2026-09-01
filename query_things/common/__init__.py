@@ -5,7 +5,10 @@ from typing import (
 
 from .api import make_record_resolver  # noqa: TID252
 from .cache import RecordCache  # noqa: TID252
-from .jsonl import parse_json_objects  # noqa: TID252
+from .jsonl import (  # noqa: TID252
+    jsonl_from_record,
+    parse_json_objects,
+)
 from .linking import (  # noqa: TID252
     all_records_have_links,
     iter_link_pids,
@@ -24,6 +27,7 @@ __all__ = [
     'all_records_have_links',
     'homogenize_annotations',
     'iter_link_pids',
+    'jsonl_from_record',
     'make_record_resolver',
     'parse_json_objects',
     'record_has_link',

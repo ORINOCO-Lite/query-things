@@ -1,4 +1,3 @@
-import json
 from unittest.mock import patch
 
 import pytest
@@ -6,6 +5,7 @@ import pytest
 from query_things.cache import cache_record
 from query_things.common import (
     RecordCache,
+    jsonl_from_record,
     parse_json_objects,
 )
 from query_things.filter_linked_pid import (
@@ -29,7 +29,7 @@ def lines_of(*items):
 
 class TestParseJsonObjects:
     def test_yields_line_and_record(self):
-        line = json.dumps(make_record('a:1', name='A'))
+        line = jsonl_from_record(make_record('a:1', name='A'))
         assert list(parse_json_objects([line + '\n'])) == [
             (line + '\n', {'pid': 'a:1', 'name': 'A'})
         ]
@@ -47,17 +47,17 @@ class TestParseJsonObjects:
 
     def test_missing_pid_raises(self):
         with pytest.raises(ValueError, match="Line 1 must have a string 'pid'"):
-            list(parse_json_objects([json.dumps({'name': 'x'}) + '\n']))
+            list(parse_json_objects([jsonl_from_record({'name': 'x'}) + '\n']))
 
     def test_non_string_pid_raises(self):
         with pytest.raises(ValueError, match="Line 1 must have a string 'pid'"):
-            list(parse_json_objects([json.dumps({'pid': 1}) + '\n']))
+            list(parse_json_objects([jsonl_from_record({'pid': 1}) + '\n']))
 
     def test_line_numbering(self):
         with pytest.raises(ValueError, match='Invalid JSON on line 2'):
             list(
                 parse_json_objects(
-                    [json.dumps(make_record('a:1')) + '\n', 'not json\n']
+                    [jsonl_from_record(make_record('a:1')) + '\n', 'not json\n']
                 )
             )
 

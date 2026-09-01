@@ -2,6 +2,7 @@ import json
 
 import pytest
 
+from query_things.common import jsonl_from_record
 from query_things.common.cache import RecordCache
 from query_things.tests import (
     cache_as_dict,
@@ -164,7 +165,7 @@ def test_save_empty_cache_does_not_create_file(tmp_path):
 
 def test_save_empty_cache_does_not_overwrite_existing_file(tmp_path):
     path = tmp_path / 'cache.json'
-    path.write_text(json.dumps({'old': {'v': 1}}), encoding='utf-8')
+    path.write_text(jsonl_from_record({'old': {'v': 1}}))
 
     RecordCache(path=path, data={}).save()
 
@@ -173,7 +174,7 @@ def test_save_empty_cache_does_not_overwrite_existing_file(tmp_path):
 
 def test_save_overwrites_existing_file(tmp_path):
     path = tmp_path / 'cache.json'
-    path.write_text(json.dumps({'old': {'v': 1}}), encoding='utf-8')
+    path.write_text(jsonl_from_record({'old': {'v': 1}}))
 
     RecordCache(path=path, data={'new': {'v': 2}}).save()
 

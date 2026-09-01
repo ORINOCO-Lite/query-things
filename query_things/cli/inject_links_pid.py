@@ -1,4 +1,3 @@
-import json
 import sys
 
 import click
@@ -6,6 +5,7 @@ import click
 from query_things.cli._options import stdargs
 from query_things.common import (
     RecordCache,
+    jsonl_from_record,
     parse_json_objects,
 )
 from query_things.inject_links_pid import inject_linking_records
@@ -57,10 +57,4 @@ def cli(
             class_name=class_name,
             token=token,
         )
-        click.echo(
-            json.dumps(
-                rec,
-                ensure_ascii=True,
-                separators=(',', ':'),
-            )
-        )
+        click.echo(jsonl_from_record(rec))
