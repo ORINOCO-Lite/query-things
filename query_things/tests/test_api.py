@@ -3,11 +3,10 @@ from unittest.mock import patch
 
 import pytest
 
-from query_things.cache import cache_records
+from query_things.cache import cache_record
 from query_things.common import (
     RecordCache,
     parse_json_objects,
-    try_parse_record,
 )
 from query_things.filter_linked_pid import (
     filter_linked_pid,
@@ -63,54 +62,36 @@ class TestParseJsonObjects:
             )
 
 
-class TestTryParseRecord:
-    @pytest.mark.parametrize(
-        ('line', 'expected'),
-        [
-            (json.dumps(make_record('a:1', name='A')), {'pid': 'a:1', 'name': 'A'}),
-            ('not json', None),
-            (json.dumps([1, 2]), None),
-            (json.dumps({'name': 'x'}), None),
-            (json.dumps({'pid': 1}), None),
-            ('', None),
-        ],
-    )
-    def test_cases(self, line, expected):
-        assert try_parse_record(line) == expected
-
-
 class TestCacheRecords:
     def test_stores_and_passes_through(self):
         cache = RecordCache()
-        lines = lines_of(make_record('a:1'), make_record('b:2'))
+        rec = make_record('a:1')
 
-        out = list(cache_records(lines, cache))
+        cache_record(rec, cache)
 
-        assert out == lines
         assert cache_as_dict(cache) == {
             'a:1': make_record('a:1'),
-            'b:2': make_record('b:2'),
         }
 
     def test_invalid_input_is_skipped_but_passed_through(self):
         cache = RecordCache()
-        lines = [
-            'not json\n',
-            '[]\n',
-            json.dumps({'name': 'x'}) + '\n',
-            *lines_of(make_record('a:1')),
+        vals = [
+            {},
+            {'other', 5},
         ]
 
-        out = list(cache_records(lines, cache))
+        for val in vals:
+            assert cache_record(val, cache) == val
 
-        assert out == lines
-        assert cache_as_dict(cache) == {'a:1': make_record('a:1')}
+        assert cache_as_dict(cache) == {}
 
     def test_duplicate_pid_overwrites(self):
         cache = RecordCache()
-        lines = lines_of(make_record('a:1', name='old'), make_record('a:1', name='new'))
-
-        list(cache_records(lines, cache))
+        for rec in (
+            make_record('a:1', name='old'),
+            make_record('a:1', name='new'),
+        ):
+            cache_record(rec, cache)
 
         assert cache['a:1']['name'] == 'new'
 

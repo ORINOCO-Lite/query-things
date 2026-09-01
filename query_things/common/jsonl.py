@@ -29,24 +29,3 @@ def parse_json_objects(lines: Iterable[str]) -> Iterator[tuple[str, dict]]:
             raise ValueError(msg)  # noqa: TRY004
 
         yield line, rec
-
-
-def try_parse_record(line: str) -> dict | None:
-    """Parse a single line as a JSON record.
-
-    Returns None for any input that is not a JSON object with a
-    string `pid` property.
-    """
-    try:
-        rec = json.loads(line)
-    except ValueError:
-        return None
-
-    if not isinstance(rec, dict):
-        return None
-
-    pid = rec.get('pid')
-    if not isinstance(pid, str):
-        return None
-
-    return rec

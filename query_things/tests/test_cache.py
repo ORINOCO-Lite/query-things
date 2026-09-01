@@ -12,10 +12,6 @@ from query_things.tests import (
 @pytest.mark.parametrize(
     ('items', 'expected_cache'),
     [
-        ([], {}),
-        ([''], {}),
-        (['not json'], {}),
-        ([{'name': 'no pid'}], {}),
         (
             [make_record('123', name='example')],
             {'123': make_record('123', name='example')},
@@ -23,8 +19,6 @@ from query_things.tests import (
         (
             [
                 make_record('1', value='first'),
-                'not json',
-                {'name': 'missing pid'},
                 make_record('2', value='second'),
             ],
             {
