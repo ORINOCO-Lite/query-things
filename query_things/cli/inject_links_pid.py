@@ -39,7 +39,7 @@ def cli(
     class_name: str | None,
     api_url: str,
     token: str | None,
-    record_cache: RecordCache,
+    record_cache: RecordCache,  # noqa: ARG001
     collection: tuple[str, ...] = ('public',),
 ):
     """Inject records that link to each input record"""
