@@ -2,8 +2,10 @@ from pathlib import Path
 
 import pytest
 
-from query_things.cli.filter_links_pid import cli
-from query_things.filter_links_pid import read_pids
+from query_things.cli.filter_links_pid import (
+    cli,
+    read_pids,
+)
 from query_things.tests import (
     jsonl_lines,
     make_record,

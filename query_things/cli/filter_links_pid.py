@@ -9,10 +9,14 @@ from query_things.common import (
     make_record_resolver,
     parse_json_objects,
 )
-from query_things.filter_links_pid import (
-    read_pids,
-    record_links_pid,
-)
+from query_things.filter_links_pid import record_links_pid
+
+
+def read_pids(path: Path | str) -> frozenset[str]:
+    """Read PIDs from a file, one PID per line. Blank lines are ignored."""
+    path = Path(path)
+    with path.open('r', encoding='utf-8') as fp:
+        return frozenset(line.strip() for line in fp if line.strip())
 
 
 @click.command('filter-links-pid')

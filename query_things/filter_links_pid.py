@@ -2,20 +2,12 @@ from collections.abc import (
     Callable,
     Sequence,
 )
-from pathlib import Path
 
 from query_things.common import (
     Record,
     record_has_link,
     record_has_link_any,
 )
-
-
-def read_pids(path: Path | str) -> frozenset[str]:
-    """Read PIDs from a file, one PID per line. Blank lines are ignored."""
-    path = Path(path)
-    with path.open('r', encoding='utf-8') as fp:
-        return frozenset(line.strip() for line in fp if line.strip())
 
 
 def record_links_pid(
