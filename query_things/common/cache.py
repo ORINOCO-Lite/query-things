@@ -1,4 +1,6 @@
 import json
+import os
+import tempfile
 from collections.abc import (
     Iterator,
     KeysView,
@@ -67,5 +69,16 @@ class RecordCache:
         if not self._data:
             return
 
-        with self._path.open('w') as fp:
-            json.dump(self._data, fp)
+        # Readers in a shell pipeline must see a complete old or new cache,
+        # never the truncated file while another command is writing it.
+        temporary = None
+        try:
+            with tempfile.NamedTemporaryFile(
+                mode='w', encoding='utf-8', dir=self._path.parent, delete=False,
+            ) as fp:
+                temporary = Path(fp.name)
+                json.dump(self._data, fp)
+            os.replace(temporary, self._path)
+        finally:
+            if temporary is not None:
+                temporary.unlink(missing_ok=True)
