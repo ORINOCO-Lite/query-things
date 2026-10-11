@@ -194,3 +194,40 @@ def test_save_and_load_roundtrip(tmp_path):
 
     assert len(loaded) == len(data)
     assert all(loaded[key] == data[key] for key in data)
+
+
+def test_readers_see_complete_cache_during_save(tmp_path, monkeypatch):
+    path = tmp_path / 'cache.json'
+    original = {'homepage': {'pid': 'example:.'}}
+    path.write_text(json.dumps(original))
+    observed = []
+    dump = json.dump
+
+    def interrupted_write(data, stream):
+        stream.write('{')
+        stream.flush()
+        observed.append(cache_as_dict(RecordCache.load(path)))
+        stream.seek(0)
+        stream.truncate()
+        dump(data, stream)
+
+    monkeypatch.setattr(json, 'dump', interrupted_write)
+    updated = {**original, 'person': {'pid': 'example:person'}}
+    RecordCache(path=path, data=updated).save()
+    assert observed == [original]
+    assert cache_as_dict(RecordCache.load(path)) == updated
+
+
+def test_failed_save_preserves_complete_cache(tmp_path, monkeypatch):
+    path = tmp_path / 'cache.json'
+    original = {'homepage': {'pid': 'example:.'}}
+    path.write_text(json.dumps(original))
+
+    def fail(data, stream):
+        stream.write('{')
+        raise ValueError('interrupted serialization')
+
+    monkeypatch.setattr(json, 'dump', fail)
+    with pytest.raises(ValueError, match='interrupted serialization'):
+        RecordCache(path=path, data={'replacement': {}}).save()
+    assert cache_as_dict(RecordCache.load(path)) == original
